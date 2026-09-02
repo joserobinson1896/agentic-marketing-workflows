@@ -24,6 +24,7 @@ Usage:
 
 import argparse
 import json
+import os
 import sys
 from pathlib import Path
 
@@ -37,12 +38,40 @@ PORTRAIT_H = 480
 SQUARE_H = 270
 SCALE = 4  # 270*4 = 1080, 480*4 = 1920
 
-FONT_LINKS = (
-    '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>'
-    '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?'
-    "family=Fraunces:opsz,wght@9..144,600..900&family=IBM+Plex+Sans:wght@400;500;600;700"
-    '&family=IBM+Plex+Mono:wght@400;500&display=swap">'
-)
+FONT_DIR = ROOT / "execution" / "fonts"
+FONT_MANIFEST = FONT_DIR / "manifest.json"
+
+
+def embedded_font_css():
+    """Inline the vendored woff2 files as @font-face data URIs.
+
+    Rendering must not depend on fonts.googleapis.com: the cloud sandbox has
+    allowlisted egress, and a blocked font request fails *silently* — the ads
+    would render in a fallback serif and upload looking wrong. See
+    execution/fetch_fonts.py for how these files get here.
+    """
+    import base64
+
+    if not FONT_MANIFEST.exists():
+        raise RuntimeError(
+            f"{FONT_MANIFEST} missing — run `python3 execution/fetch_fonts.py` once "
+            "to vendor the brand webfonts."
+        )
+
+    faces = []
+    cache = {}
+    for entry in json.loads(FONT_MANIFEST.read_text()):
+        path = FONT_DIR / entry["file"]
+        if not path.exists() or path.stat().st_size == 0:
+            raise RuntimeError(f"Font file missing or empty: {path}")
+        if entry["file"] not in cache:
+            cache[entry["file"]] = base64.b64encode(path.read_bytes()).decode("ascii")
+        faces.append(
+            f"@font-face{{font-family:'{entry['family']}';"
+            f"font-style:{entry['style']};font-weight:{entry['weight']};"
+            f"src:url(data:font/woff2;base64,{cache[entry['file']]}) format('woff2');}}"
+        )
+    return "".join(faces)
 
 SOFT_FILTER = (
     '<svg width="0" height="0" style="position:absolute"><defs>'
@@ -61,10 +90,80 @@ html,body{{margin:0;padding:0;background:#fff;}}
 """
 
 
-def standalone_html(card_html, width, height):
+REQUIRED_FAMILIES = ["Fraunces", "IBM Plex Sans", "IBM Plex Mono"]
+
+
+def chromium_executable():
+    """Locate a usable Chromium, preferring one the environment already ships.
+
+    A cloud sandbox typically pre-installs a Chromium build and blocks
+    cdn.playwright.dev, so a pip-installed playwright whose expected browser
+    revision differs cannot download the one it wants and `launch()` fails.
+    Pointing at the existing binary sidesteps the version handshake entirely.
+    """
+    explicit = os.environ.get("AD_CREATOR_CHROMIUM")
+    if explicit and Path(explicit).exists():
+        return explicit
+
+    browsers_path = os.environ.get("PLAYWRIGHT_BROWSERS_PATH")
+    if not browsers_path or not Path(browsers_path).is_dir():
+        return None  # let playwright resolve its own default (the local-dev case)
+
+    base = Path(browsers_path)
+    candidates = [base / "chromium"]
+    candidates += sorted(base.glob("chromium-*/chrome-linux/chrome"), reverse=True)
+    candidates += sorted(base.glob("chromium-*/chrome-linux64/chrome"), reverse=True)
+    candidates += sorted(
+        base.glob("chromium_headless_shell-*/chrome-linux/headless_shell"), reverse=True
+    )
+    for candidate in candidates:
+        if candidate.exists():
+            return str(candidate)
+    return None
+
+
+def assert_fonts_loaded(page):
+    """Fail loudly if a brand face didn't actually parse.
+
+    Deliberately not document.fonts.check(): that returns true when *no*
+    @font-face matches (it happily falls through to a system font) and false
+    for a declared-but-not-yet-used face, so it reports the opposite of the
+    truth in both directions. Forcing a load and reading back the FontFace
+    status tests the thing that matters — did this font file parse and become
+    usable.
+    """
+    failed = page.evaluate(
+        """async (families) => {
+            const bad = [];
+            for (const family of families) {
+                try {
+                    await document.fonts.load(`700 16px "${family}"`);
+                } catch (e) {
+                    bad.push(family + ' (load threw)');
+                    continue;
+                }
+                let ok = false;
+                for (const face of document.fonts) {
+                    if (face.family.replace(/['"]/g, '') === family
+                        && face.status === 'loaded') { ok = true; break; }
+                }
+                if (!ok) bad.push(family);
+            }
+            return bad;
+        }""",
+        REQUIRED_FAMILIES,
+    )
+    if failed:
+        raise RuntimeError(
+            f"Brand webfonts unavailable: {', '.join(failed)}. Ads would render in a "
+            "fallback face — refusing to ship them. Check execution/fonts/."
+        )
+
+
+def standalone_html(card_html, width, height, font_css):
     return (
         '<!doctype html><html><head><meta charset="utf-8">'
-        f"{FONT_LINKS}<style>{CSS}{ASSET_CSS.format(w=width, h=height)}</style>"
+        f"<style>{font_css}{CSS}{ASSET_CSS.format(w=width, h=height)}</style>"
         f"</head><body>{SOFT_FILTER}{card_html}</body></html>"
     )
 
@@ -78,9 +177,15 @@ def render_batch(rows, out_dir, brand=None, seed=None, prefix=""):
     out_dir = Path(out_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
 
+    font_css = embedded_font_css()
     written = []
     with sync_playwright() as p:
-        browser = p.chromium.launch()
+        executable = chromium_executable()
+        browser = (
+            p.chromium.launch(executable_path=executable)
+            if executable
+            else p.chromium.launch()
+        )
         try:
             for card in cards:
                 height = PORTRAIT_H if card["shape"] == "portrait" else SQUARE_H
@@ -90,12 +195,13 @@ def render_batch(rows, out_dir, brand=None, seed=None, prefix=""):
                 )
                 try:
                     page.set_content(
-                        standalone_html(card["card"], CARD_W, height),
-                        wait_until="networkidle",
+                        standalone_html(card["card"], CARD_W, height, font_css),
+                        wait_until="load",
                     )
                     # Webfonts must be resolved before the screenshot or the ad
                     # silently ships in a fallback face.
                     page.evaluate("() => document.fonts.ready")
+                    assert_fonts_loaded(page)
                     name = f"{prefix}{card['slug']}.png"
                     path = out_dir / name
                     page.screenshot(path=str(path), type="png")
