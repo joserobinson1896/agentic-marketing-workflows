@@ -28,7 +28,12 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "execution"))
 
 from generate_ad_creatives import build_gallery, load_brand  # noqa: E402
-from google_drive_upload import upload_file  # noqa: E402
+
+# google_drive_upload is imported lazily inside main(), not here: it pulls in the
+# Google API client libraries, which only the local-machine OAuth path needs. A
+# cloud routine's sandbox has no reason to have them installed (it delivers via
+# the Google-Drive MCP connector instead), and a module-level import would crash
+# the whole run before a single ad got generated.
 
 PLAN_PATH = ROOT / "execution" / "rotation_plan.json"
 OUT_ROOT = ROOT / ".tmp" / "generated_ads"
@@ -92,6 +97,8 @@ def main():
 
     drive_name = f"{brand['name']} Ad Batch — {date_str}.html"
     try:
+        from google_drive_upload import upload_file
+
         link = upload_file(gallery_path, drive_name, folder_id=DRIVE_FOLDER_ID)
         log(f"Uploaded to Drive: {link}")
     except Exception as e:
