@@ -211,6 +211,15 @@ def render_mark(brand):
     )
 
 
+def slugify(text):
+    """Filename-safe slug, used to name the exported PNG for each ad."""
+    keep = [c.lower() if c.isalnum() else "-" for c in text]
+    slug = "".join(keep)
+    while "--" in slug:
+        slug = slug.replace("--", "-")
+    return slug.strip("-")[:60] or "ad"
+
+
 def render_pick_button():
     return (
         '<button class="pick" type="button" aria-pressed="false" '
@@ -225,23 +234,25 @@ def render_slot(card_id, label, card_html):
     )
 
 
-def render_template_a(idx, row, rng, used_combos, cta_i, brand):
+def render_template_a(idx, row, rng, used_combos, cta_i, brand, include_pick=True):
     stops = pick_trio(rng, used_combos, brand["palette"])
     direction = PORTRAIT_DIRS[idx % 4]
     preset = PORTRAIT_PRESETS[idx % 4]
     bg = render_bg_svg(300, 534, f"g{idx}", stops, direction, preset, brand["shadow_ink"])
     ctas = brand["default_ctas"]
     cta = row.get("cta") or ctas[cta_i % len(ctas)]
+    pick = render_pick_button() if include_pick else ""
     card = (
-        f'<div class="card portrait">{bg}{render_pick_button()}'
+        f'<div class="card portrait">{bg}{pick}'
         f'<div class="panel">{render_mark(brand)}<h2>{row["headline"]}</h2>'
         f'<span class="cta">{cta}</span></div></div>'
     )
     label = f'Template A · {row.get("niche", "")}'
-    return render_slot(f"a{idx}", label, card)
+    return {"id": f"a{idx}", "label": label, "card": card, "shape": "portrait",
+            "slug": slugify(f'A-{row.get("niche", "ad")}')}
 
 
-def render_template_b(idx, row, rng, used_combos, cta_i, brand):
+def render_template_b(idx, row, rng, used_combos, cta_i, brand, include_pick=True):
     stops = pick_trio(rng, used_combos, brand["palette"])
     direction = PORTRAIT_DIRS[idx % 4]
     preset = PORTRAIT_PRESETS[idx % 4]
@@ -258,29 +269,33 @@ def render_template_b(idx, row, rng, used_combos, cta_i, brand):
         f'<div class="statchip-text"><span class="statchip-label">{row["stat_label"]}</span>'
         f'<span class="statchip-value">{row["stat_value"]}</span></div></div>'
     )
+    pick = render_pick_button() if include_pick else ""
     card = (
-        f'<div class="card portrait">{bg}{render_pick_button()}'
+        f'<div class="card portrait">{bg}{pick}'
         f'<div class="panel">{render_mark(brand)}<h2>{row["headline"]}</h2>'
         f'{statchip}<span class="cta">{cta}</span></div></div>'
     )
     label = f'Template B · {row.get("niche", row.get("company", ""))}'
-    return render_slot(f"b{idx}", label, card)
+    return {"id": f"b{idx}", "label": label, "card": card, "shape": "portrait",
+            "slug": slugify(f'B-{row.get("company", row.get("niche", "ad"))}')}
 
 
-def render_template_c(idx, row, rng, used_combos, link_i, brand):
+def render_template_c(idx, row, rng, used_combos, link_i, brand, include_pick=True):
     stops = pick_trio(rng, used_combos, brand["palette"])
     direction = SQUARE_DIRS[idx % 4]
     preset = SQUARE_PRESETS[idx % 4]
     bg = render_bg_svg(300, 300, f"g{idx}", stops, direction, preset, brand["shadow_ink"])
     links = brand["default_links"]
     link_text = row.get("link_text") or links[link_i % len(links)]
+    pick = render_pick_button() if include_pick else ""
     card = (
-        f'<div class="card square">{bg}{render_pick_button()}'
+        f'<div class="card square">{bg}{pick}'
         f'<div class="panel">{render_mark(brand)}<h2>{row["headline"]}</h2>'
         f'<span class="link">{link_text}</span></div></div>'
     )
     label = "Template C · Thought leadership"
-    return render_slot(f"c{idx}", label, card)
+    return {"id": f"c{idx}", "label": label, "card": card, "shape": "square",
+            "slug": slugify(f'C-{row["headline"][:40]}')}
 
 
 CSS = """
@@ -308,14 +323,17 @@ header p{ font-size:15px; line-height:1.6; color:var(--page-muted); margin:0; }
   font-size:13px; color:var(--page-muted); cursor:pointer; user-select:none; }
 .toolbar input[type="checkbox"]{ width:15px; height:15px; accent-color:var(--accent); cursor:pointer; }
 .board{ display:flex; flex-wrap:wrap; gap:32px; align-items:flex-start; }
-.slot{ display:flex; flex-direction:column; gap:10px; width:260px; }
+.slot{ display:flex; flex-direction:column; gap:10px; width:270px; }
 .slot-label{ font-family:'IBM Plex Mono', monospace; font-size:11px; letter-spacing:.02em; color:var(--page-muted); }
 .slot.is-picked .slot-label{ color:var(--page-ink); font-weight:500; }
-.card{ position:relative; width:260px; border-radius:6px; overflow:hidden; border:1px solid var(--page-border);
+/* 270 x 480 and 270 x 270 are exactly 9:16 and 1:1 — the same ratios the PNG
+   export ships at (1080x1920 / 1080x1080), so the review preview and the
+   delivered asset are the same shape. */
+.card{ position:relative; width:270px; border-radius:6px; overflow:hidden; border:1px solid var(--page-border);
   box-shadow:0 16px 34px -20px rgba(20,26,20,.35); font-family:'IBM Plex Sans', sans-serif;
   transition:box-shadow .15s ease; }
-.card.portrait{ height:463px; }
-.card.square{ height:260px; }
+.card.portrait{ height:480px; }
+.card.square{ height:270px; }
 .slot.is-picked .card{ box-shadow:0 0 0 3px var(--pick-ring), 0 16px 34px -20px rgba(20,26,20,.4); }
 .card svg.bg{ position:absolute; inset:0; width:100%; height:100%; display:block; }
 .pick{ position:absolute; top:10px; right:10px; z-index:2; width:26px; height:26px; border-radius:999px;
@@ -394,7 +412,13 @@ SCRIPT = """
 """
 
 
-def build_gallery(rows, seed=None, brand=None):
+def build_cards(rows, seed=None, brand=None, include_pick=True):
+    """Build every card once, in order.
+
+    Both the review gallery and the PNG export go through here, so a given
+    (rows, seed, brand) always yields byte-identical card markup and the same
+    color trios — the exported asset is exactly the ad that was reviewed.
+    """
     brand = brand or DEFAULT_BRAND
     rng = random.Random(seed)
     used_combos = set()
@@ -403,19 +427,26 @@ def build_gallery(rows, seed=None, brand=None):
     for idx, row in enumerate(rows):
         template = row["template"].upper()
         if template == "A":
-            cards.append(render_template_a(idx, row, rng, used_combos, cta_i, brand))
+            cards.append(render_template_a(idx, row, rng, used_combos, cta_i, brand, include_pick))
             if not row.get("cta"):
                 cta_i += 1
         elif template == "B":
-            cards.append(render_template_b(idx, row, rng, used_combos, cta_i, brand))
+            cards.append(render_template_b(idx, row, rng, used_combos, cta_i, brand, include_pick))
             if not row.get("cta"):
                 cta_i += 1
         elif template == "C":
-            cards.append(render_template_c(idx, row, rng, used_combos, link_i, brand))
+            cards.append(render_template_c(idx, row, rng, used_combos, link_i, brand, include_pick))
             if not row.get("link_text"):
                 link_i += 1
         else:
             raise ValueError(f"Unknown template '{row['template']}' in row {idx}")
+    return cards
+
+
+def build_gallery(rows, seed=None, brand=None):
+    brand = brand or DEFAULT_BRAND
+    built = build_cards(rows, seed=seed, brand=brand, include_pick=True)
+    cards = [render_slot(c["id"], c["label"], c["card"]) for c in built]
 
     total = len(rows)
     script = SCRIPT.replace("TOTAL", str(total)).replace("STORAGE_KEY", brand["storage_key"])

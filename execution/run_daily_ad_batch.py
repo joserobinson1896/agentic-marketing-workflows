@@ -84,25 +84,44 @@ def main():
 
     print(f"GALLERY_PATH={gallery_path}")
     print(f"BRAND_NAME={brand['name']}")
-    print(f"DRIVE_FILENAME={brand['name']} Ad Batch — {date_str}.html")
 
-    credentials_ready = (ROOT / "credentials.json").exists() and (ROOT / "token.json").exists()
-    if not credentials_ready:
-        log(
-            "Local OAuth not configured (no credentials.json/token.json here) — "
-            f"gallery saved locally only: {gallery_path}. "
-            "A cloud routine should upload GALLERY_PATH via its Google-Drive MCP tool instead."
-        )
+    # The PNGs are the actual deliverable — 1080x1920 / 1080x1080 files you can
+    # upload straight into an ads manager. gallery.html stays the review surface.
+    png_dir = out_dir / "png"
+    try:
+        from render_ads_to_png import render_batch
+
+        pngs = render_batch(rows, png_dir, brand=brand, seed=seed)
+        log(f"Rendered {len(pngs)} PNGs -> {png_dir}")
+        for path in pngs:
+            print(f"PNG={path}")
+    except Exception as e:
+        log(f"PNG rendering FAILED: {e}")
+        pngs = []
+
+    folder_name = f"{brand['name']} Ad Batch — {date_str}"
+    print(f"DRIVE_FOLDER_NAME={folder_name}")
+
+    if not pngs:
+        log("No PNGs to deliver — stopping before upload.")
         return
 
-    drive_name = f"{brand['name']} Ad Batch — {date_str}.html"
+    # Binary assets are far too large to hand back through an MCP tool call as
+    # base64 (each PNG is 150-750KB), so the upload always goes straight to the
+    # Drive API from here, using whatever credentials the environment provides.
     try:
-        from google_drive_upload import upload_file
+        from google_drive_upload import upload_batch
 
-        link = upload_file(gallery_path, drive_name, folder_id=DRIVE_FOLDER_ID)
-        log(f"Uploaded to Drive: {link}")
+        to_upload = list(pngs) + [gallery_path]
+        folder_link, links = upload_batch(
+            to_upload, folder_name, parent_id=DRIVE_FOLDER_ID
+        )
+        log(f"Uploaded {len(links)} files to Drive folder: {folder_link}")
+        print(f"DRIVE_FOLDER_LINK={folder_link}")
     except Exception as e:
-        log(f"Drive upload FAILED (gallery still saved locally at {gallery_path}): {e}")
+        log(
+            f"Drive upload FAILED (assets still on disk at {png_dir}): {e}"
+        )
 
 
 if __name__ == "__main__":
