@@ -131,12 +131,34 @@ Nothing in the unattended path proofreads rendered text, and ~1 in 10 generation
 
 **launchd gives the script no shell environment**, so `gemini_image_generate._get_client()` loads `.env` by absolute path rather than a cwd-relative `load_dotenv()` search — a bare search silently finds nothing and fails later at auth. Verify any change to that path with `env -i <abs python> <script> --dry-run`, which reproduces launchd's bare environment.
 
-### Cloud cutover (not yet done)
-Two blockers, both because the cloud runner works from a fresh git clone:
-1. **`GEMINI_API_KEY` is in gitignored `.env`** — it must be injected as a cloud secret/env var.
-2. **Reference images must be in the repo.** This is why they live in `execution/reference_images/` (~6.2 MB) rather than `.tmp/` — `.tmp/` is disposable, and a daily job depending on disposable inputs breaks the first time it's cleared.
+### Google Drive authorization (done — but the setup has two traps)
+Delivery runs on an OAuth Desktop client (`credentials.json`, project `job-search-claude-506615`) with a single scope, `drive.file`. `execution/authorize_google_drive.py` writes `token.json` (gitignored) holding the refresh token.
 
-Only one scheduler should be live at a time, or the same day's slice generates and uploads twice (wasted spend, duplicate Drive folders). Unload the local one with `launchctl bootout gui/$(id -u)/com.marketingcoursedemo.image-ads-daily` before enabling a cloud routine.
+Two traps cost a detour the first time:
+1. **A consent screen in "Testing" status refuses everyone not on its test-user list** — including the project owner — with `Error 403: access_denied`, "has not completed the Google verification process."
+2. **Worse, and easy to miss: apps in Testing status with External user type have their refresh tokens revoked by Google after 7 days.** Simply adding yourself as a test user "fixes" the 403 but leaves an unattended daily job that silently dies every week.
+
+**The fix for both is to publish the app to Production** (Google Cloud Console → APIs & Services → Audience → Publish app). This needs no verification review, because `drive.file` is classified **non-sensitive** — it only grants access to files the app itself created, never the user's existing Drive. Had the pipeline used `drive.readonly` or full `drive` (both sensitive/restricted), publishing would have required a verification process and a CASA security assessment.
+
+Verified working: a 1.1 MB PNG uploads to a dated folder and returns a shareable link. The `google-auth` version conflict pip warns about (from installing `google-genai`) does **not** break the upload path.
+
+### Cloud cutover (routine created, disabled pending secrets)
+Routine **`trig_0177oCsmnsD136TT7gLCKwNQ`** — "AI Runner Image Ads Daily", cron `0 12 * * *`, currently `enabled: false`.
+
+It stays disabled until two environment variables are set on it:
+- `GEMINI_API_KEY` — a fresh clone has no `.env`, so without this every run fails at auth.
+- `GOOGLE_OAUTH_TOKEN_JSON` — the contents of the local `token.json`. `google_drive_upload.get_credentials()` checks this env var before falling back to the file, so the cloud path needs no `token.json` on disk.
+
+**Set these through the claude.ai routine UI, not from an agent session.** Passing a credential as a tool-call argument writes it into the conversation transcript, and the Claude Code auto-mode classifier blocks commands that print secrets to stdout for exactly that reason. That guardrail is correct — don't route around it.
+
+Why the reference images live in `execution/reference_images/` (~6.2 MB) rather than `.tmp/`: a fresh clone must have them, and `.tmp/` is both gitignored and disposable. A daily job cannot depend on disposable inputs.
+
+**The cloud routine does something launchd cannot: proofread.** Its prompt has the agent Read each generated PNG and compare the rendered text against `selected_scenes.json`, then name the defective ads in its report. The local job has no LLM in the loop and ships typos silently. That QA step is the main reason to prefer the routine.
+
+**Only one scheduler may be live at a time**, or the same day's slice generates and uploads twice — double spend, duplicate Drive folders. Before enabling the routine, unload the local job:
+`launchctl bootout gui/$(id -u)/com.marketingcoursedemo.image-ads-daily`
+
+**DST:** `0 12 * * *` is 8:00 AM only while EDT is in effect. When EST begins it becomes 7:00 AM and must be changed to `0 13 * * *`. Cron is UTC-only and not DST-aware.
 
 ## Edge cases / things learned
 - Label the style reference as "style only, never its product" — omitting this blends the two products together.
