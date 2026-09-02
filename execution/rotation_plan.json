@@ -1,0 +1,77 @@
+{
+  "_comment": "Fixed weekday rotation for the unattended daily ad batch. Each weekday name maps to a brand; that brand's row-group is picked by today's date-ordinal modulo len(groups) (stateless by design — see run_daily_ad_batch.py). Add more groups any time to extend variety before repeats.",
+  "weekday_brand": {
+    "Monday": "unified_dashboards",
+    "Tuesday": "leadforge",
+    "Wednesday": "unified_dashboards",
+    "Thursday": "leadforge",
+    "Friday": "leadforge"
+  },
+  "brands": {
+    "unified_dashboards": {
+      "brand_config": "execution/brands/unified_dashboards.json",
+      "groups": [
+        [
+          {"template": "A", "niche": "SaaS founders",
+           "headline": "MRR, churn, and CAC — finally in one place",
+           "cta": "See a sample dashboard →"},
+          {"template": "B", "niche": "E-commerce", "company": "Bloom Skincare",
+           "headline": "Bloom Skincare cut weekly reporting from 9 hours to 40 minutes",
+           "stat_label": "Weekly reporting time", "stat_value": "9h → 40min",
+           "trend": "down", "cta": "See how →"},
+          {"template": "C", "headline": "The real cost of checking six dashboards a day",
+           "link_text": "See the breakdown →"}
+        ],
+        [
+          {"template": "A", "niche": "Mobile app studios",
+           "headline": "Installs, retention, and revenue — one screen",
+           "cta": "See how it works →"},
+          {"template": "B", "niche": "Real estate teams", "company": "Harlow Realty",
+           "headline": "Harlow Realty caught a $40,000 pipeline gap in their first week",
+           "stat_label": "Pipeline gap found", "stat_value": "$40,000",
+           "trend": "up", "cta": "See how →"},
+          {"template": "C", "headline": "What HubSpot, Stripe, and Mailchimp never agree on",
+           "link_text": "See how we solve it →"}
+        ]
+      ]
+    },
+    "leadforge": {
+      "brand_config": "execution/brands/leadforge.json",
+      "groups": [
+        [
+          {"template": "A", "niche": "B2B SaaS sales teams",
+           "headline": "Fit, intent, and verified contact info — before the first call",
+           "cta": "See sample leads →"},
+          {"template": "B", "niche": "Home services", "company": "Brightline Roofing",
+           "headline": "Brightline Roofing booked 47 qualified estimates in their first month",
+           "stat_label": "Qualified estimates booked", "stat_value": "0 → 47",
+           "trend": "up", "cta": "See how →"},
+          {"template": "C", "headline": "Why most \"qualified\" leads never take a sales call",
+           "link_text": "See the breakdown →"}
+        ],
+        [
+          {"template": "A", "niche": "Home services & contractors",
+           "headline": "Ready-to-book homeowners, matched to your service area",
+           "cta": "Book a strategy call →"},
+          {"template": "B", "niche": "Real estate teams", "company": "Anders & Cole Realty",
+           "headline": "Anders & Cole Realty cut cost-per-lead by 62% in six weeks",
+           "stat_label": "Cost per lead", "stat_value": "-62%",
+           "trend": "down", "cta": "See how →"},
+          {"template": "C", "headline": "The real cost of chasing leads that were never going to buy",
+           "link_text": "Read the playbook →"}
+        ],
+        [
+          {"template": "A", "niche": "Recruiting & staffing agencies",
+           "headline": "Warm candidates and hiring managers, already qualified",
+           "cta": "See how it works →"},
+          {"template": "B", "niche": "Insurance brokers", "company": "Vantage Point Insurance",
+           "headline": "Vantage Point Insurance filled its pipeline with 210 verified leads in 30 days",
+           "stat_label": "Verified leads delivered", "stat_value": "210",
+           "trend": "up", "cta": "Get your pipeline audit →"},
+          {"template": "C", "headline": "What your CRM isn't telling you about lead quality",
+           "link_text": "See how we qualify leads →"}
+        ]
+      ]
+    }
+  }
+}

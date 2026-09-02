@@ -1,0 +1,44 @@
+[
+  {
+    "template": "A",
+    "niche": "SaaS founders",
+    "headline": "MRR, churn, and CAC — finally in one place",
+    "cta": "See a sample dashboard →"
+  },
+  {
+    "template": "B",
+    "niche": "E-commerce",
+    "company": "Bloom Skincare",
+    "headline": "Bloom Skincare cut weekly reporting from 9 hours to 40 minutes",
+    "stat_label": "Weekly reporting time",
+    "stat_value": "9h → 40min",
+    "trend": "down",
+    "cta": "See how →"
+  },
+  {
+    "template": "C",
+    "headline": "The real cost of checking six dashboards a day",
+    "link_text": "See the breakdown →"
+  },
+  {
+    "template": "C",
+    "headline": "What HubSpot, Stripe, and Mailchimp never agree on",
+    "link_text": "See how we solve it →"
+  },
+  {
+    "template": "B",
+    "niche": "Real estate teams",
+    "company": "Harlow Realty",
+    "headline": "Harlow Realty caught a $40,000 pipeline gap in their first week",
+    "stat_label": "Pipeline gap found",
+    "stat_value": "$40,000",
+    "trend": "up",
+    "cta": "See how →"
+  },
+  {
+    "template": "A",
+    "niche": "Mobile app studios",
+    "headline": "Installs, retention, and revenue — one screen",
+    "cta": "See how it works →"
+  }
+]
