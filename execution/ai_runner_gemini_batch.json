@@ -1,0 +1,106 @@
+{
+  "product_image": "execution/reference_images/product_ai_sneaker.jpeg",
+  "product_fidelity": "IMAGE 1 is the PRODUCT \u2014 reproduce this exact shoe with total fidelity: the chunky low-top runner with bone/cream and warm grey panels, charcoal mesh, black lace cage with black-and-white speckled laces, the bold black 'AI' logo on the side panel, small orange accent stripes, a chunky white midsole and a gum-brown outsole. Do not redesign, recolor, or restyle the shoe. Keep the 'AI' logo crisp, correctly shaped and correctly placed. Do not add any other brand marks, wordmarks or small text onto the shoe itself.",
+  "ads": [
+    {
+      "id": "01_studio_colorblock",
+      "style_ref": "execution/reference_images/ref_white_platform_wood.png",
+      "aspect_ratio": "1:1",
+      "scene": "Studio product hero with no model. A single shoe floats at a slight three-quarter angle against a hard-edged two-tone backdrop: warm cream on the upper half, deep burnt orange on the lower half. Crisp studio strobe lighting with one soft key from the upper left, a tight contact shadow beneath the sole, and immaculate seamless-cyclorama cleanliness. IMAGE 2 is the STYLE REFERENCE only \u2014 borrow its bright, high-key, sun-clean color grade, never its shoe.",
+      "headline": "MEET THE AI RUNNER",
+      "subline": "Bone Grey. Out now.",
+      "cta": "Shop now",
+      "copy_placement": "Headline centered across the upper cream half in bold uppercase charcoal sans-serif, subline directly beneath it in a lighter weight, and the pill CTA centered in the lower orange half in white text on a charcoal pill."
+    },
+    {
+      "id": "02_wet_street_night",
+      "style_ref": "execution/reference_images/ref_beige_suede_street.png",
+      "aspect_ratio": "4:5",
+      "scene": "Night city street after rain. Ankle-height side-profile crop of a model standing on glossy wet asphalt, warm shop-window and traffic light reflected in the puddles as long streaks of amber and cool blue bokeh. Moody low-key exposure with a bright specular rim along the midsole. Styled with slim black jeans. IMAGE 2 is the STYLE REFERENCE only \u2014 borrow its tight ankle-height crop, long-lens compression and creamy background blur, never its shoe.",
+      "headline": "OWN THE NIGHT",
+      "subline": "Grip that holds the wet.",
+      "cta": "Get yours",
+      "copy_placement": "Headline across the top in bold uppercase sans-serif in warm white with a thin orange underline rule, subline beneath in smaller white text, pill CTA in the lower-left with an orange fill and white text."
+    },
+    {
+      "id": "03_skate_ledge_sun",
+      "style_ref": "execution/reference_images/ref_blue_runner_onfoot.png",
+      "aspect_ratio": "4:5",
+      "scene": "A model sits on a raw concrete ledge in a sunlit skate plaza, legs dangling, shot from a low front angle so both shoes fill the lower frame. Hard midday sun casting crisp geometric shadows across pale concrete, strong contrast, slightly punchy contemporary color grade. Styled with cuffed loose denim. IMAGE 2 is the STYLE REFERENCE only \u2014 borrow its ground-level camera height and natural daylight realism, never its shoe.",
+      "headline": "ALL DAY, EVERY BLOCK",
+      "subline": "Cushioned for concrete.",
+      "cta": "Shop the drop",
+      "copy_placement": "Headline stacked in the upper-left in bold condensed uppercase charcoal sans-serif, subline directly under it, pill CTA in the lower-right with an orange fill and white text."
+    },
+    {
+      "id": "04_motion_stride",
+      "style_ref": "execution/reference_images/ref_blue_runner_onfoot.png",
+      "aspect_ratio": "9:16",
+      "scene": "Dynamic action frame: a runner mid-stride on a city pavement, captured with a panning motion so the background streaks into horizontal blur while the lead shoe stays razor sharp and fully in focus. Overcast diffused daylight, a faint dust kick at the toe-off. Styled with black athletic joggers. IMAGE 2 is the STYLE REFERENCE only \u2014 borrow its energetic low ground-level viewpoint, never its shoe.",
+      "headline": "BUILT FOR MOMENTUM",
+      "subline": "Lightweight. Responsive.",
+      "cta": "Shop now",
+      "copy_placement": "Headline across the top third in bold uppercase white sans-serif over the blurred background, subline beneath in smaller white text, pill CTA centered near the bottom with an orange fill and white text."
+    },
+    {
+      "id": "05_sand_editorial",
+      "style_ref": "execution/reference_images/ref_white_platform_wood.png",
+      "aspect_ratio": "4:5",
+      "scene": "Editorial still life with no model. The pair rests on rippled pale desert sand, one shoe upright and one tipped onto its side to reveal the gum outsole tread. Warm late-afternoon sun raking low across the ripples, long soft shadows, minimal warm-neutral palette. IMAGE 2 is the STYLE REFERENCE only \u2014 borrow its bright sunlit high-key treatment and raking directional shadows, never its shoe.",
+      "headline": "GO YOUR OWN WAY",
+      "subline": "The everyday runner.",
+      "cta": "Explore the range",
+      "copy_placement": "Headline in the upper-right in bold uppercase charcoal sans-serif, subline beneath it, pill CTA in the lower-right with a charcoal fill and white text."
+    },
+    {
+      "id": "06_subway_commute",
+      "style_ref": "execution/reference_images/ref_beige_suede_street.png",
+      "aspect_ratio": "4:5",
+      "scene": "Candid commuter moment on a subway platform. Ankle-height side view of a model waiting by the platform edge, glossy white tiled wall and yellow safety line behind, cool fluorescent overhead light with a slight cyan cast, background softly blurred with a hint of an approaching train's light. Styled with straight-leg grey trousers. IMAGE 2 is the STYLE REFERENCE only \u2014 borrow its tight ankle-height crop and shallow depth of field, never its shoe.",
+      "headline": "MADE FOR THE MILES",
+      "subline": "Comfort that commutes.",
+      "cta": "See the fit",
+      "copy_placement": "Headline across the top in bold uppercase charcoal sans-serif on the clean tiled area, subline directly beneath, pill CTA in the lower-left with an orange fill and white text."
+    },
+    {
+      "id": "07_flatlay_kit",
+      "style_ref": "execution/reference_images/ref_white_platform_wood.png",
+      "aspect_ratio": "1:1",
+      "scene": "Perfectly overhead flat-lay on a smooth pale concrete surface. The pair sits at a slight diagonal, arranged with a folded pair of light-wash denim, a stainless watch, and a coiled pair of black headphones as supporting props, all neatly spaced with generous negative space. Soft even daylight from a large window, gentle natural shadows. IMAGE 2 is the STYLE REFERENCE only \u2014 borrow its clean top-down orientation and bright natural light, never its shoe.",
+      "headline": "YOUR EVERYDAY KIT",
+      "subline": "One pair, every outfit.",
+      "cta": "Shop the look",
+      "copy_placement": "Headline in the upper-left corner in bold uppercase charcoal sans-serif, subline beneath it, pill CTA in the lower-right with an orange fill and white text."
+    },
+    {
+      "id": "08_forest_trail",
+      "style_ref": "execution/reference_images/ref_blue_runner_onfoot.png",
+      "aspect_ratio": "4:5",
+      "scene": "A model steps across damp mossy stones on a woodland trail, shot from a low ground-level angle with the lead shoe planted on a stone in sharp focus. Dappled green forest light filtering through the canopy, wet stone texture, rich natural greens against the warm bone upper. Styled with rolled dark chinos. IMAGE 2 is the STYLE REFERENCE only \u2014 borrow its low stone-backed outdoor setup and soft natural daylight, never its shoe.",
+      "headline": "OFF THE PAVEMENT",
+      "subline": "Grip for whatever's next.",
+      "cta": "Find your pair",
+      "copy_placement": "Headline across the top in bold uppercase warm-white sans-serif with a subtle dark scrim behind it for legibility, subline beneath, pill CTA in the lower-right with an orange fill and white text."
+    },
+    {
+      "id": "09_lobby_reflection",
+      "style_ref": "execution/reference_images/ref_white_platform_wood.png",
+      "aspect_ratio": "9:16",
+      "scene": "Architectural setting with no model. A single shoe sits at a three-quarter angle on a polished dark terrazzo floor that throws a clean mirror reflection, set inside a bright glass-and-steel lobby with tall vertical window mullions receding softly out of focus behind it. Cool daylight with a warm bounce on the upper, sleek and premium. IMAGE 2 is the STYLE REFERENCE only \u2014 borrow its bright clean daylight quality, never its shoe.",
+      "headline": "QUIET CONFIDENCE",
+      "subline": "Engineered simplicity.",
+      "cta": "Discover the AI Runner",
+      "copy_placement": "Headline across the upper area in bold uppercase charcoal sans-serif, subline beneath it in a lighter weight, pill CTA centered near the bottom with a charcoal fill and white text."
+    },
+    {
+      "id": "10_boardwalk_sunset",
+      "style_ref": "execution/reference_images/ref_beige_suede_street.png",
+      "aspect_ratio": "4:5",
+      "scene": "Golden-hour beach boardwalk. Ankle-height side view of a model walking along weathered timber planks, strong warm backlight from a low sun creating a bright rim light along the midsole and a long shadow stretching toward camera, hazy amber lens flare, sea and sky blurred to a soft gradient behind. Styled with rolled light-wash denim. IMAGE 2 is the STYLE REFERENCE only \u2014 borrow its ankle-height crop and long-lens background compression, never its shoe.",
+      "headline": "CHASE THE LIGHT",
+      "subline": "Summer-ready comfort.",
+      "cta": "Shop now",
+      "copy_placement": "Headline across the top in bold uppercase warm-white sans-serif, subline beneath it, pill CTA in the lower-left with an orange fill and white text."
+    }
+  ]
+}
