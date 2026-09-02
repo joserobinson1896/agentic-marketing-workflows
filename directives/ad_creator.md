@@ -84,6 +84,15 @@ Two ways it's deployed:
 
 Only one of these two should be enabled at a time — running both would double-post the same day's batch to Drive (though never a *duplicate rotation slice*, since the date-based picker is deterministic either way). As of the cloud cutover the local LaunchAgent is unloaded (`launchctl bootout`), leaving the cloud routine as the only live schedule.
 
+### Deliverable format
+`gallery.html` is the **review** surface; the **deliverable** is a set of PNGs — an HTML file can't be uploaded to an ads manager. `execution/render_ads_to_png.py` screenshots each card in headless Chromium at 1080x1920 (A/B) and 1080x1080 (C). It renders the *same* card markup the gallery uses (via `build_cards()`), so the exported asset is what was reviewed rather than the output of a second, drifting renderer; gallery cards are 270x480 / 270x270 so preview and export share an aspect ratio.
+
+Learned while adding PNG export:
+- **Binary assets cannot go through the Drive MCP connector.** `create_file` accepts `base64Content`, but the model has to *emit* that base64 as a tool argument. A 700KB PNG is ~950KB of base64 (~240K tokens) — past any max-output limit, and even the smallest ad only just fits. Uploads therefore go straight to the Drive API from `google_drive_upload.py`, which reads credentials from `GOOGLE_SERVICE_ACCOUNT_JSON` / `GOOGLE_OAUTH_TOKEN_JSON` / `token.json`, in that order. The 12KB HTML gallery was small enough to sneak through MCP; nothing bigger is.
+- **Vendor the webfonts.** The sandbox has allowlisted egress, so fonts.googleapis.com can't be relied on — and a blocked font request fails *silently*, shipping a whole batch set in fallback serif. `execution/fetch_fonts.py` vendors them (94KB, OFL) and the renderer embeds them as data URIs.
+- **Don't verify fonts with `document.fonts.check()`.** It returns `true` when *no* `@font-face` matches (falling through to a system font) and `false` for a declared-but-not-yet-used face — i.e. wrong in both directions. Force `document.fonts.load()` then read the `FontFace.status`, and test the guard against a deliberately corrupted font file.
+- **Use the sandbox's prebuilt Chromium.** It ships one at `$PLAYWRIGHT_BROWSERS_PATH` (revision 1194) and blocks cdn.playwright.dev, so a pip-installed playwright expecting another revision can neither use nor fetch a browser. Pass `executable_path` instead of pinning versions.
+
 Learned while wiring up the cloud routine:
 - **The cloud sandbox has no Google API client libraries.** `google_drive_upload.py` must therefore be imported *lazily*, inside the branch that actually uses it — a module-level import crashed the entire run before a single ad was generated. The cloud path never needs those libs at all; it delivers through MCP.
 - **The Drive MCP tool is `mcp__Google-Drive__create_file`** (`textContent`, `contentMimeType`, `disableConversionToGoogleType: true` to keep it as a real `.html` file rather than converting to a Google Doc).
