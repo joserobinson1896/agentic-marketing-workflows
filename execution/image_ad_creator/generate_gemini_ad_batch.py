@@ -35,6 +35,13 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 import _paths  # noqa: F401,E402  (puts every execution area on sys.path)
 from gemini_image_generate import DEFAULT_MODEL, generate_image  # noqa: E402
+from spend_gate import add_spend_argument, confirm_spend  # noqa: E402  (lives in shared/)
+
+# The directive's own smoke test is "start with 3 for approval unless the user has already
+# approved a larger run", so 3 is where the free pass belongs here rather than the shared
+# default of 10. At ~$0.039 an image a 10-image free pass would be $0.39 of unasked spend,
+# and an image batch is the one place a systematic prompt flaw gets expensive fastest.
+FREE_PASS_IMAGES = 3
 
 
 def build_prompt(spec: dict, ad: dict) -> str:
@@ -66,6 +73,7 @@ def main():
     parser.add_argument("--only", nargs="*", default=None, help="Only generate these ad ids")
     parser.add_argument("--image-size", default="1K")
     parser.add_argument("--model", default=DEFAULT_MODEL)
+    add_spend_argument(parser)
     args = parser.parse_args()
 
     with open(args.spec) as f:
@@ -77,6 +85,13 @@ def main():
         missing = set(args.only) - {a["id"] for a in ads}
         if missing:
             print(f"WARNING: ids not found in spec: {', '.join(sorted(missing))}")
+
+    # The gate sits after the spec is parsed and filtered, so `len(ads)` is the real number
+    # of images this run would pay for, and before the output directory exists, so a refused
+    # run leaves nothing behind.
+    if not confirm_spend(calls=len(ads), model=args.model, label="generate ad images",
+                         assume_yes=args.yes_spend, free_pass=FREE_PASS_IMAGES):
+        return 1
 
     os.makedirs(args.out, exist_ok=True)
     ok, failed = [], []
@@ -104,7 +119,10 @@ def main():
     print(f"GENERATED={len(ok)}/{len(ads)}")
     if failed:
         print(f"FAILED_IDS={','.join(failed)}")
+    return 0
 
 
 if __name__ == "__main__":
-    main()
+    # sys.exit, not a bare main(): a refused spend gate returns 1 and a caller has to be
+    # able to see that in the exit code rather than reading the log for it.
+    sys.exit(main())
