@@ -1,34 +1,39 @@
-# Pinned to the versions this tree is proven on. Python 3.10+.
+# Python 3.10+.
 #
 #   pip install -r requirements.txt
 #   playwright install chromium      # separate step: pip installs the driver, not the browser
+#
+# These versions were resolved and installed together into a clean virtualenv, then the full
+# test suite and every pipeline's free path were run against them. That matters more than it
+# sounds: an earlier pin of google-auth-oauthlib==1.2.3 caps google-auth below 2.42, while
+# google-genai requires 2.56 or newer, so the two are mutually exclusive. Installing them one
+# at a time only warns, which is why the combination looked fine on a machine that had grown
+# into it, and a fresh `pip install -r` failed outright with ResolutionImpossible.
+#
+# If you bump google-auth-oauthlib DOWN, or google-genai UP, check that pairing first.
 
 # HTTP, for every vendor API: Instantly, Apollo, BuiltWith, Clearbit, RB2B.
-requests==2.31.0
+requests==2.34.2
 
 # .env loading. Scripts load it by ABSOLUTE path rather than searching from the cwd,
 # because under launchd there is no shell environment and a bare search silently finds
 # nothing, then fails later at auth where the cause is much harder to see.
-python-dotenv==1.2.1
+python-dotenv==1.2.3
 
 # The visitor-identification site and its webhook receiver.
-Flask==3.1.2
+Flask==3.1.3
 
 # Image handling for the Gemini ad pipeline.
-Pillow==9.5.0
+pillow==12.3.0
 
 # Gemini: ad image generation, and the copy drafting in both email pipelines.
-#
-# NOTE: installing google-genai upgrades google-auth past what google-auth-oauthlib 1.2.3
-# pins. pip prints a dependency warning. The Drive upload path still works, and this is
-# verified, not assumed. If Drive auth ever starts failing, this is the first thing to look at.
 google-genai==2.22.0
 
 # Google Drive delivery for the ad batches and the visitor dashboard.
-google-api-python-client==2.187.0
-google-auth-oauthlib==1.2.3
+google-api-python-client==2.200.0
+google-auth-oauthlib==1.4.1
 
 # Headless Chromium: ad PNG export, and the browser-driven mock visitor sessions.
 # In a sandbox that ships its own browser, point PLAYWRIGHT_BROWSERS_PATH or
 # AD_CREATOR_CHROMIUM at it instead of downloading one.
-playwright==1.57.0
+playwright==1.62.0

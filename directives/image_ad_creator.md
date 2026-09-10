@@ -116,7 +116,7 @@ for part in response.candidates[0].content.parts:
 ```
 
 Notes:
-- Dependencies: `google-genai`, `pillow`, `python-dotenv`. Installing `google-genai` upgrades `google-auth` past what `google-auth-oauthlib` 1.2.3 pins — pip warns, but the Drive upload path still works. Watch for it if Drive auth ever starts failing.
+- Dependencies: `google-genai`, `pillow`, `python-dotenv`. **`google-genai` and `google-auth-oauthlib` fight over `google-auth`**: oauthlib 1.2.3 caps it below 2.42 and google-genai needs 2.56 or newer. Installing one at a time only warns, so a machine that grew into the combination looks fine while a clean `pip install -r requirements.txt` fails outright with `ResolutionImpossible`. `requirements.txt` pins oauthlib 1.4.1, which lifts the cap. Re-check that pairing before moving either version.
 - `client.models.generate_content` is the stable path. Current docs also front a newer `client.interactions` API (real — it exists in the SDK) and newer image models (`gemini-3.1-flash-image`, `gemini-3-pro-image`, up to 4K, more reference images). Untested here; `gemini-2.5-flash-image` is what this pipeline is proven on. Pass `--model` to experiment.
 - Up to 14 reference images are accepted; this pipeline uses 2.
 - The SDK prints a harmless "Direct use of automatic function calling (AFC)" warning on every call — filter it from output, it is not an error.
