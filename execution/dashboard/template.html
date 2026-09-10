@@ -1,0 +1,1355 @@
+<title>Cheap Leads, Expensive Revenue</title>
+<style>
+/* ============================================================ iOS design tokens
+   Light and dark are SELECTED, not flipped: chart hues are re-stepped per mode
+   and each set was run through the dataviz palette validator (all-pairs CVD).  */
+:root{
+  --bg:#F2F2F7; --card:#FFFFFF; --card-2:#F9F9FB; --raised:#FFFFFF;
+  --label:#000000; --label-2:rgba(60,60,67,.62); --label-3:rgba(60,60,67,.36);
+  --sep:rgba(60,60,67,.20); --sep-strong:rgba(60,60,67,.32);
+  --tint:#0E9C7A; --tint-bg:rgba(14,156,122,.10);
+  --fill:rgba(120,120,128,.12); --fill-2:rgba(120,120,128,.20);
+  --good:#0E9C7A; --bad:#C7362B; --warn:#A88600;
+  --good-bg:rgba(14,156,122,.12); --bad-bg:rgba(199,54,43,.10); --warn-bg:rgba(168,134,0,.12);
+  --c1:#D9720E; --c2:#1268D6; --c3:#0E9C7A; --c4:#B0399F;
+  --seq1:#A8E0CE; --seq2:#5EC7A8; --seq3:#189F7F; --seq4:#0A6B54;
+  --hot1:#F0D6A6; --hot2:#E3AC5E; --hot3:#D9720E; --hot4:#A83E1C;
+  --grid:rgba(60,60,67,.13);
+  --shadow:0 1px 2px rgba(0,0,0,.04), 0 4px 16px rgba(0,0,0,.05);
+  --shadow-lift:0 2px 6px rgba(0,0,0,.06), 0 12px 36px rgba(0,0,0,.10);
+  --header-bg:rgba(242,242,247,.78);
+  --sys:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text","Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#000000; --card:#1C1C1E; --card-2:#161618; --raised:#2C2C2E;
+    --label:#FFFFFF; --label-2:rgba(235,235,245,.62); --label-3:rgba(235,235,245,.32);
+    --sep:rgba(84,84,88,.55); --sep-strong:rgba(84,84,88,.80);
+    --tint:#12AD87; --tint-bg:rgba(18,173,135,.16);
+    --fill:rgba(120,120,128,.24); --fill-2:rgba(120,120,128,.36);
+    --good:#12AD87; --bad:#E5645A; --warn:#C9A227;
+    --good-bg:rgba(18,173,135,.16); --bad-bg:rgba(229,100,90,.14); --warn-bg:rgba(201,162,39,.16);
+    --c1:#D07D2C; --c2:#3D8BEF; --c3:#12AD87; --c4:#C951B5;
+    --seq1:#0A5F4A; --seq2:#0E8567; --seq3:#17AB86; --seq4:#5FD3B4;
+    --hot1:#6B4A1E; --hot2:#A2702C; --hot3:#D07D2C; --hot4:#E8A05C;
+    --grid:rgba(235,235,245,.12);
+    --shadow:0 1px 2px rgba(0,0,0,.5), 0 4px 16px rgba(0,0,0,.4);
+    --shadow-lift:0 2px 8px rgba(0,0,0,.6), 0 16px 40px rgba(0,0,0,.5);
+    --header-bg:rgba(0,0,0,.72);
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#000000; --card:#1C1C1E; --card-2:#161618; --raised:#2C2C2E;
+  --label:#FFFFFF; --label-2:rgba(235,235,245,.62); --label-3:rgba(235,235,245,.32);
+  --sep:rgba(84,84,88,.55); --sep-strong:rgba(84,84,88,.80);
+  --tint:#12AD87; --tint-bg:rgba(18,173,135,.16);
+  --fill:rgba(120,120,128,.24); --fill-2:rgba(120,120,128,.36);
+  --good:#12AD87; --bad:#E5645A; --warn:#C9A227;
+  --good-bg:rgba(18,173,135,.16); --bad-bg:rgba(229,100,90,.14); --warn-bg:rgba(201,162,39,.16);
+  --c1:#D07D2C; --c2:#3D8BEF; --c3:#12AD87; --c4:#C951B5;
+  --seq1:#0A5F4A; --seq2:#0E8567; --seq3:#17AB86; --seq4:#5FD3B4;
+  --hot1:#6B4A1E; --hot2:#A2702C; --hot3:#D07D2C; --hot4:#E8A05C;
+  --grid:rgba(235,235,245,.12);
+  --shadow:0 1px 2px rgba(0,0,0,.5), 0 4px 16px rgba(0,0,0,.4);
+  --shadow-lift:0 2px 8px rgba(0,0,0,.6), 0 16px 40px rgba(0,0,0,.5);
+  --header-bg:rgba(0,0,0,.72);
+}
+
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--label);font-family:var(--sys);
+  font-size:15px;line-height:1.47;-webkit-font-smoothing:antialiased;
+  font-feature-settings:"tnum" 0}
+.tnum,.v,td.n,th.n{font-variant-numeric:tabular-nums}
+button{font-family:inherit;font-size:inherit;color:inherit;cursor:pointer}
+:focus-visible{outline:2.5px solid var(--tint);outline-offset:2px;border-radius:6px}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+/* ============================================================ chrome */
+.nav{position:sticky;top:0;z-index:60;background:var(--header-bg);
+  -webkit-backdrop-filter:saturate(180%) blur(20px);backdrop-filter:saturate(180%) blur(20px);
+  border-bottom:.5px solid var(--sep)}
+.nav-in{max-width:1280px;margin:0 auto;padding:10px 22px;display:flex;align-items:center;gap:16px}
+.mark{display:flex;align-items:center;gap:9px;min-width:0}
+.mark svg{width:24px;height:24px;flex:none}
+.mark .w{font-size:16px;font-weight:640;letter-spacing:-.022em;white-space:nowrap}
+.mark .s{font-size:11px;color:var(--label-2);letter-spacing:-.01em;white-space:nowrap}
+.nav-sp{flex:1}
+.iconbtn{width:34px;height:34px;border-radius:50%;border:none;background:var(--fill);
+  display:flex;align-items:center;justify-content:center;transition:background .15s}
+.iconbtn:hover{background:var(--fill-2)}
+.iconbtn svg{width:17px;height:17px}
+.askbtn{display:flex;align-items:center;gap:7px;border:none;border-radius:980px;
+  background:var(--tint);color:#fff;padding:8px 15px 8px 12px;font-size:14.5px;
+  font-weight:590;letter-spacing:-.01em;transition:filter .15s,transform .08s;white-space:nowrap}
+.askbtn:hover{filter:brightness(1.06)}
+.askbtn:active{transform:scale(.97)}
+.askbtn svg{width:16px;height:16px}
+.askbtn[disabled]{background:var(--fill-2);color:var(--label-3);cursor:not-allowed;filter:none}
+
+.hero{max-width:1280px;margin:0 auto;padding:26px 22px 4px}
+.hero h1{margin:0;font-size:34px;font-weight:700;letter-spacing:-.028em;line-height:1.1}
+.hero p{margin:5px 0 0;color:var(--label-2);font-size:15px;max-width:70ch}
+
+.segwrap{position:sticky;top:55px;z-index:50;background:var(--header-bg);
+  -webkit-backdrop-filter:saturate(180%) blur(20px);backdrop-filter:saturate(180%) blur(20px);
+  padding:12px 0 12px}
+.seg-in{max-width:1280px;margin:0 auto;padding:0 22px;display:flex;gap:12px;align-items:center;
+  flex-wrap:wrap}
+.seg{display:inline-flex;background:var(--fill);border-radius:10px;padding:2px;gap:2px}
+.seg button{border:none;background:transparent;border-radius:8px;padding:6px 15px;
+  font-size:14px;font-weight:510;letter-spacing:-.01em;color:var(--label);
+  transition:background .18s,box-shadow .18s;white-space:nowrap}
+.seg button[aria-selected="true"]{background:var(--raised);box-shadow:0 1px 3px rgba(0,0,0,.10),0 0 0 .5px rgba(0,0,0,.04)}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]) .seg button[aria-selected="true"]{box-shadow:0 1px 3px rgba(0,0,0,.6)}
+}
+:root[data-theme="dark"] .seg button[aria-selected="true"]{box-shadow:0 1px 3px rgba(0,0,0,.6)}
+
+main{max-width:1280px;margin:0 auto;padding:8px 22px 90px}
+section[hidden]{display:none}
+.stack{display:grid;gap:18px}
+
+/* ============================================================ cards */
+.card{background:var(--card);border-radius:16px;box-shadow:var(--shadow);overflow:hidden}
+.card-h{padding:17px 20px 0}
+.card-h h2{margin:0;font-size:19px;font-weight:640;letter-spacing:-.021em}
+.card-h p{margin:4px 0 0;color:var(--label-2);font-size:13.5px;max-width:78ch}
+.card-b{padding:16px 20px 20px}
+.card-b.tight{padding-top:8px}
+.note{display:flex;gap:8px;align-items:flex-start;margin:14px 20px 16px;padding:10px 13px;
+  background:var(--fill);border-radius:11px;font-size:12.5px;color:var(--label-2);line-height:1.45}
+.note svg{width:14px;height:14px;flex:none;margin-top:2px;opacity:.65}
+.note b{color:var(--label);font-weight:590}
+
+/* KPI tiles */
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(158px,1fr));gap:12px}
+.kpi{background:var(--card);border-radius:16px;padding:15px 17px 16px;box-shadow:var(--shadow)}
+.kpi .l{font-size:12.5px;color:var(--label-2);font-weight:510;letter-spacing:-.005em}
+.kpi .v{font-size:27px;font-weight:680;letter-spacing:-.028em;margin-top:5px;line-height:1.08}
+.kpi .d{font-size:12px;color:var(--label-3);margin-top:3px}
+.kpi.accent .v{color:var(--tint)}
+
+/* grouped inset list — the iOS table row */
+.rows{display:grid}
+.row{display:flex;align-items:center;gap:14px;padding:12px 20px;
+  border-top:.5px solid var(--sep);font-size:14.5px}
+.row:first-child{border-top:none}
+.row .rl{flex:1;min-width:0}
+.row .rv{font-variant-numeric:tabular-nums;font-weight:560;white-space:nowrap}
+.row .sub{font-size:12.5px;color:var(--label-2);margin-top:1px}
+.swatch{width:11px;height:11px;border-radius:3.5px;flex:none}
+
+/* tables */
+.tw{overflow-x:auto;-webkit-overflow-scrolling:touch}
+table{border-collapse:collapse;width:100%;font-size:13.5px}
+th{position:sticky;top:0;background:var(--card);text-align:left;font-size:11.5px;font-weight:590;
+  letter-spacing:.01em;color:var(--label-2);padding:10px 13px;white-space:nowrap;
+  border-bottom:.5px solid var(--sep-strong);z-index:1}
+th.n,td.n{text-align:right}
+th.srt{cursor:pointer;user-select:none}
+th.srt:hover{color:var(--label)}
+th .car{opacity:.4;font-size:9px;margin-left:3px}
+th[aria-sort] .car{opacity:1;color:var(--tint)}
+td{padding:10px 13px;border-bottom:.5px solid var(--sep);white-space:nowrap}
+tbody tr:last-child td{border-bottom:none}
+tbody tr.click{cursor:pointer}
+tbody tr.click:hover td{background:var(--fill)}
+td.strong{font-weight:590;color:var(--label)}
+.pill{display:inline-flex;align-items:center;gap:5px;padding:2.5px 9px;border-radius:980px;
+  font-size:11.5px;font-weight:560;letter-spacing:-.005em;white-space:nowrap}
+.pill.good{background:var(--good-bg);color:var(--good)}
+.pill.bad{background:var(--bad-bg);color:var(--bad)}
+.pill.warn{background:var(--warn-bg);color:var(--warn)}
+.pill.mute{background:var(--fill);color:var(--label-2)}
+.dash{color:var(--label-3)}
+
+/* charts */
+.chart{width:100%;display:block;overflow:visible}
+.chart text{font-family:var(--sys);fill:var(--label-2)}
+.axis{font-size:11px;fill:var(--label-2)}
+.axis-strong{font-size:12px;fill:var(--label);font-weight:560}
+.vlab{font-size:11.5px;font-weight:590;fill:var(--label)}
+.gridline{stroke:var(--grid);stroke-width:1}
+.legend{display:flex;flex-wrap:wrap;gap:7px 18px;margin-top:14px;font-size:12.5px;color:var(--label-2)}
+.legend .li{display:inline-flex;align-items:center;gap:6px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.three{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+@media (max-width:1000px){.two,.three{grid-template-columns:1fr}}
+
+#tip{position:fixed;z-index:200;pointer-events:none;opacity:0;transition:opacity .1s;
+  background:var(--raised);color:var(--label);border-radius:10px;padding:9px 12px;font-size:12.5px;
+  box-shadow:var(--shadow-lift);max-width:270px;line-height:1.45}
+#tip .t{font-weight:620;margin-bottom:3px;font-size:13px}
+#tip .r{display:flex;justify-content:space-between;gap:16px}
+#tip .r span:last-child{font-variant-numeric:tabular-nums;font-weight:560}
+
+/* accounts */
+.tools{display:flex;gap:10px;flex-wrap:wrap;align-items:center;padding:14px 20px 12px}
+.search{flex:1;min-width:190px;position:relative}
+.search svg{position:absolute;left:11px;top:50%;transform:translateY(-50%);width:15px;height:15px;
+  opacity:.42;pointer-events:none}
+.search input{width:100%;border:none;background:var(--fill);border-radius:10px;
+  padding:9px 12px 9px 33px;font-size:14.5px;font-family:inherit;color:var(--label)}
+.search input::placeholder{color:var(--label-3)}
+select{border:none;background:var(--fill);border-radius:10px;padding:9px 30px 9px 12px;
+  font-size:14px;font-family:inherit;color:var(--label);appearance:none;
+  background-image:url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M3 4.5L6 7.5L9 4.5' stroke='%23888' stroke-width='1.4' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 9px center;background-size:12px}
+.count{font-size:13px;color:var(--label-2);font-variant-numeric:tabular-nums;white-space:nowrap}
+.more{width:100%;border:none;background:var(--fill);border-radius:11px;padding:11px;
+  font-size:14px;font-weight:560;color:var(--tint);margin-top:12px}
+.more:hover{background:var(--fill-2)}
+.empty{padding:44px 20px;text-align:center;color:var(--label-2);font-size:14px}
+
+/* ============================================================ sheet */
+.scrim{position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:100;opacity:0;
+  transition:opacity .28s;-webkit-backdrop-filter:blur(2px);backdrop-filter:blur(2px)}
+.scrim[hidden]{display:none}
+.scrim.on{opacity:1}
+.sheet{position:fixed;left:50%;bottom:0;transform:translate(-50%,100%);width:min(720px,100%);
+  max-height:88vh;background:var(--card);border-radius:20px 20px 0 0;z-index:101;
+  display:flex;flex-direction:column;box-shadow:var(--shadow-lift);
+  transition:transform .34s cubic-bezier(.32,.72,0,1)}
+.sheet.on{transform:translate(-50%,0)}
+.sheet[hidden]{display:none}
+.grab{width:36px;height:5px;border-radius:3px;background:var(--fill-2);margin:8px auto 0;flex:none}
+.sheet-h{display:flex;align-items:center;gap:12px;padding:12px 20px 12px;
+  border-bottom:.5px solid var(--sep);flex:none}
+.sheet-h h3{margin:0;font-size:17px;font-weight:640;letter-spacing:-.02em;flex:1}
+.sheet-b{overflow-y:auto;padding:18px 20px 20px;flex:1;-webkit-overflow-scrolling:touch}
+.closebtn{width:30px;height:30px;border-radius:50%;border:none;background:var(--fill);
+  display:flex;align-items:center;justify-content:center;flex:none}
+.closebtn svg{width:14px;height:14px;opacity:.6}
+
+/* AI */
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px}
+.chip{border:.5px solid var(--sep-strong);background:var(--card);border-radius:980px;
+  padding:8px 14px;font-size:13.5px;color:var(--label);text-align:left;
+  transition:background .15s,border-color .15s;letter-spacing:-.008em}
+.chip:hover{background:var(--fill);border-color:transparent}
+.qa{display:grid;gap:14px;margin-bottom:16px}
+.bubble{max-width:88%;padding:11px 15px;border-radius:18px;font-size:14.5px;line-height:1.5}
+.bubble.me{margin-left:auto;background:var(--tint);color:#fff;border-bottom-right-radius:5px}
+.bubble.ai{background:var(--fill);border-bottom-left-radius:5px;white-space:pre-wrap;
+  overflow-wrap:anywhere}
+.bubble.ai strong{font-weight:640}
+.bubble.err{background:var(--bad-bg);color:var(--bad)}
+.thinking{display:inline-flex;gap:4px;align-items:center;padding:3px 0}
+.thinking i{width:6px;height:6px;border-radius:50%;background:var(--label-3);
+  animation:bob 1.25s infinite ease-in-out}
+.thinking i:nth-child(2){animation-delay:.16s}.thinking i:nth-child(3){animation-delay:.32s}
+@keyframes bob{0%,72%,100%{opacity:.3;transform:translateY(0)}36%{opacity:.95;transform:translateY(-3px)}}
+.toolrun{display:inline-flex;align-items:center;gap:7px;font-size:12.5px;color:var(--label-2);
+  background:var(--fill);border-radius:8px;padding:6px 11px;margin-top:2px}
+.toolrun code{font-family:var(--mono);font-size:11.5px;color:var(--tint)}
+.ask-form{display:flex;gap:9px;align-items:flex-end;padding-top:14px;
+  border-top:.5px solid var(--sep);position:sticky;bottom:0;background:var(--card)}
+.ask-form textarea{flex:1;border:none;background:var(--fill);border-radius:18px;padding:11px 15px;
+  font-size:14.5px;font-family:inherit;color:var(--label);resize:none;max-height:120px;
+  line-height:1.45;min-height:42px}
+.ask-form textarea::placeholder{color:var(--label-3)}
+.send{width:42px;height:42px;border-radius:50%;border:none;background:var(--tint);color:#fff;
+  display:flex;align-items:center;justify-content:center;flex:none;transition:filter .15s}
+.send:hover{filter:brightness(1.07)}
+.send[disabled]{background:var(--fill-2);color:var(--label-3);cursor:not-allowed}
+.send svg{width:18px;height:18px}
+.disclaim{font-size:11.5px;color:var(--label-3);margin-top:9px;text-align:center}
+
+/* account detail */
+.det-h{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:6px}
+.dl{display:grid;grid-template-columns:repeat(auto-fit,minmax(128px,1fr));gap:12px;
+  padding:14px 0;border-bottom:.5px solid var(--sep);margin-bottom:16px}
+.dl div .k{font-size:11.5px;color:var(--label-2)}
+.dl div .v{font-size:15px;font-weight:590;margin-top:2px;font-variant-numeric:tabular-nums}
+.tl{position:relative;padding-left:22px}
+.tl::before{content:"";position:absolute;left:5px;top:6px;bottom:6px;width:1.5px;background:var(--sep-strong)}
+.ev{position:relative;padding:9px 0}
+.ev::before{content:"";position:absolute;left:-21px;top:15px;width:9px;height:9px;border-radius:50%;
+  background:var(--card);border:2px solid var(--tint)}
+.ev .et{font-size:13.5px;font-weight:560}
+.ev .es{font-size:12.5px;color:var(--label-2);margin-top:1px}
+.sect-lab{font-size:11.5px;font-weight:620;letter-spacing:.05em;text-transform:uppercase;
+  color:var(--label-2);margin:20px 0 8px}
+footer{max-width:1280px;margin:0 auto;padding:0 22px 40px;color:var(--label-3);font-size:12px;
+  line-height:1.7}
+</style>
+
+<nav class="nav">
+  <div class="nav-in">
+    <div class="mark">
+      <svg viewBox="0 0 20 20" aria-hidden="true">
+        <circle cx="10" cy="10" r="2.6" fill="var(--tint)"></circle>
+        <path d="M10 10 L2 3 M10 10 L18 2 M10 10 L17 16" stroke="var(--tint)" stroke-width="1.3"
+              fill="none" stroke-linecap="round"></path>
+      </svg>
+      <div>
+        <div class="w">Unified Dashboards</div>
+        <div class="s">Marketing performance · trailing 18 months</div>
+      </div>
+    </div>
+    <div class="nav-sp"></div>
+    <button class="iconbtn" id="theme" aria-label="Switch appearance" title="Switch appearance">
+      <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"
+           stroke-linecap="round"><circle cx="10" cy="10" r="3.6"></circle>
+        <path d="M10 1.6v2M10 16.4v2M18.4 10h-2M3.6 10h-2M15.9 4.1l-1.4 1.4M5.5 14.5l-1.4 1.4M15.9 15.9l-1.4-1.4M5.5 5.5L4.1 4.1"></path>
+      </svg>
+    </button>
+    <button class="askbtn" id="askbtn">
+      <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7"
+           stroke-linecap="round" stroke-linejoin="round">
+        <path d="M10 2.2l1.7 4.5 4.6 1.6-4.6 1.7L10 14.5 8.3 10 3.7 8.3l4.6-1.6z"></path>
+      </svg>
+      Ask about this data
+    </button>
+  </div>
+</nav>
+
+<div class="hero">
+  <h1 id="ttl">Overview</h1>
+  <p id="sub">We spent $309,920 across five channels. This is which ones produced revenue that stuck.</p>
+</div>
+
+<div class="segwrap">
+  <div class="seg-in">
+    <div class="seg" role="tablist" aria-label="Dashboard sections">
+      <button role="tab" aria-selected="true"  data-s="overview">Overview</button>
+      <button role="tab" aria-selected="false" data-s="channels">Channels</button>
+      <button role="tab" aria-selected="false" data-s="sales">Sales</button>
+      <button role="tab" aria-selected="false" data-s="revenue">Revenue</button>
+      <button role="tab" aria-selected="false" data-s="accounts">Accounts</button>
+    </div>
+  </div>
+</div>
+
+<main>
+  <section id="s-overview"><div class="stack" id="overview"></div></section>
+  <section id="s-channels" hidden><div class="stack" id="channels"></div></section>
+  <section id="s-sales"    hidden><div class="stack" id="sales"></div></section>
+  <section id="s-revenue"  hidden><div class="stack" id="revenue"></div></section>
+  <section id="s-accounts" hidden><div class="stack" id="accounts"></div></section>
+</main>
+
+<footer id="foot"></footer>
+
+<div id="tip" role="status" aria-live="polite"></div>
+
+<div class="scrim" id="scrim" hidden></div>
+
+<div class="sheet" id="sheet" hidden role="dialog" aria-modal="true" aria-labelledby="sheet-t">
+  <div class="grab"></div>
+  <div class="sheet-h">
+    <h3 id="sheet-t">Ask about this data</h3>
+    <button class="closebtn" id="sheet-x" aria-label="Close">
+      <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.9"
+           stroke-linecap="round"><path d="M2 2l10 10M12 2L2 12"></path></svg>
+    </button>
+  </div>
+  <div class="sheet-b" id="sheet-b"></div>
+</div>
+
+<script>
+const D = __DATA__;
+
+/* ------------------------------------------------------------ formatting */
+const nf = new Intl.NumberFormat('en-US');
+const money = (n, d = 0) => n == null ? '—' :
+  '$' + n.toLocaleString('en-US', { minimumFractionDigits: d, maximumFractionDigits: d });
+const money2 = n => n == null ? '—' : '$' + n.toFixed(2);
+const pct = (n, d = 0) => n == null ? '—' : (n * 100).toFixed(d) + '%';
+const int = n => n == null ? '—' : nf.format(Math.round(n));
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c =>
+  ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const CH = D.channel_labels;
+
+/* ------------------------------------------------------------ tooltip */
+const tip = document.getElementById('tip');
+document.addEventListener('mousemove', e => {
+  const t = e.target.closest('[data-tip]');
+  if (!t) { tip.style.opacity = 0; return; }
+  tip.innerHTML = t.getAttribute('data-tip');
+  tip.style.opacity = 1;
+  const r = tip.getBoundingClientRect();
+  let x = e.clientX + 14, y = e.clientY - r.height - 12;
+  if (x + r.width > innerWidth - 8) x = e.clientX - r.width - 14;
+  if (y < 8) y = e.clientY + 18;
+  tip.style.left = x + 'px'; tip.style.top = y + 'px';
+});
+document.addEventListener('mouseleave', () => tip.style.opacity = 0);
+/* Returns markup that is safe to sit inside a double-quoted HTML attribute: values
+   are escaped as text, then every structural quote becomes &quot; so the attribute
+   cannot be terminated early. innerHTML decodes it back on the way out. */
+const tipHTML = (title, rows) => (
+  `<div class="t">${esc(title)}</div>` + rows.map(([k, v]) =>
+    `<div class="r"><span>${esc(k)}</span><span>${esc(v)}</span></div>`).join('')
+).replace(/"/g, '&quot;');
+
+/* ------------------------------------------------------------ chart primitives
+   Hand-drawn SVG: the forms here are bars, lines and one slope chart, and drawing
+   them keeps every mark on the validated iOS palette without shipping a library. */
+
+/* Horizontal bars. Rows are always direct-labelled, so colour is free to encode
+   performance rather than identity. */
+function barsH(rows, opts = {}) {
+  const { w = 640, rowH = 34, pad = 4, labelW = 128, valueW = 74, fmt = int } = opts;
+  const max = Math.max(...rows.map(r => r.v), 0) || 1;
+  const h = rows.length * rowH + 8;
+  const bw = w - labelW - valueW;
+  let s = `<svg class="chart" viewBox="0 0 ${w} ${h}" role="img" aria-label="${esc(opts.alt || '')}">`;
+  rows.forEach((r, i) => {
+    const y = i * rowH + 4, bh = rowH - pad * 2 - 4;
+    const len = Math.max(2, (r.v / max) * bw);
+    s += `<text class="axis-strong" x="${labelW - 10}" y="${y + bh / 2 + 4.5}" text-anchor="end">${esc(r.k)}</text>`;
+    s += `<rect x="${labelW}" y="${y}" width="${bw}" height="${bh}" rx="4" fill="var(--fill)"></rect>`;
+    s += `<rect x="${labelW}" y="${y}" width="${len}" height="${bh}" rx="4" fill="${r.c || 'var(--tint)'}"
+            data-tip="${r.tip || ''}"></rect>`;
+    s += `<text class="vlab" x="${labelW + bw + 10}" y="${y + bh / 2 + 4.5}">${esc(r.lab ?? fmt(r.v))}</text>`;
+  });
+  return s + '</svg>';
+}
+
+/* Round an axis maximum up to a 1 / 2 / 2.5 / 5 x 10^n step so the gridline labels
+   land on readable values instead of 98.3%. */
+function niceMax(v) {
+  if (!(v > 0)) return 1;
+  const mag = Math.pow(10, Math.floor(Math.log10(v)));
+  for (const step of [1, 1.25, 1.5, 2, 2.5, 3, 4, 5, 7.5, 10]) {
+    if (v <= step * mag * 0.999) return step * mag;
+  }
+  return 10 * mag;
+}
+
+/* Vertical bars over an ordered band scale. */
+function barsV(rows, opts = {}) {
+  const { w = 560, h = 210, fmt = v => pct(v, 1) } = opts;
+  const padL = 40, padB = 42, padT = 16;
+  const max = opts.max ?? niceMax(Math.max(...rows.map(r => r.v)));
+  const bw = (w - padL - 14) / rows.length;
+  let s = `<svg class="chart" viewBox="0 0 ${w} ${h}" role="img" aria-label="${esc(opts.alt || '')}">`;
+  for (let g = 0; g <= 4; g++) {
+    const y = padT + (h - padT - padB) * (g / 4);
+    s += `<line class="gridline" x1="${padL}" y1="${y}" x2="${w - 6}" y2="${y}"></line>`;
+    s += `<text class="axis" x="${padL - 8}" y="${y + 4}" text-anchor="end">${fmt(max * (1 - g / 4))}</text>`;
+  }
+  rows.forEach((r, i) => {
+    const bh = Math.max(2, (r.v / max) * (h - padT - padB));
+    const x = padL + i * bw + bw * 0.18, y = h - padB - bh, ww = bw * 0.64;
+    s += `<rect x="${x}" y="${y}" width="${ww}" height="${bh}" rx="4" fill="${r.c}"
+            data-tip="${r.tip || ''}"></rect>`;
+    s += `<text class="vlab" x="${x + ww / 2}" y="${y - 7}" text-anchor="middle">${esc(r.lab ?? fmt(r.v))}</text>`;
+    s += `<text class="axis" x="${x + ww / 2}" y="${h - padB + 17}" text-anchor="middle">${esc(r.k)}</text>`;
+    if (r.k2) s += `<text class="axis" x="${x + ww / 2}" y="${h - padB + 31}" text-anchor="middle"
+      style="fill:var(--label-3)">${esc(r.k2)}</text>`;
+  });
+  return s + '</svg>';
+}
+
+/* Multi-series lines for the survival curves. */
+function lines(series, opts = {}) {
+  const { w = 620, h = 250, xlab = 'Month', fmt = v => pct(v, 0) } = opts;
+  const padL = 42, padB = 38, padT = 14, padR = opts.padR ?? 58;
+  const n = Math.max(...series.map(s => s.pts.length));
+  const X = i => padL + (w - padL - padR) * (i / (n - 1));
+  const Y = v => padT + (h - padT - padB) * (1 - v);
+  let s = `<svg class="chart" viewBox="0 0 ${w} ${h}" role="img" aria-label="${esc(opts.alt || '')}">`;
+  for (let g = 0; g <= 4; g++) {
+    const y = padT + (h - padT - padB) * (g / 4);
+    s += `<line class="gridline" x1="${padL}" y1="${y}" x2="${w - padR}" y2="${y}"></line>`;
+    s += `<text class="axis" x="${padL - 8}" y="${y + 4}" text-anchor="end">${fmt(1 - g / 4)}</text>`;
+  }
+  for (let i = 0; i < n; i += 2)
+    s += `<text class="axis" x="${X(i)}" y="${h - padB + 17}" text-anchor="middle">${i}</text>`;
+  s += `<text class="axis" x="${(padL + w - padR) / 2}" y="${h - 6}" text-anchor="middle">${esc(xlab)}</text>`;
+  series.forEach(se => {
+    const pts = se.pts.map((v, i) => v == null ? null : [X(i), Y(v)]).filter(Boolean);
+    if (!pts.length) return;
+    s += `<path d="${pts.map((p, i) => (i ? 'L' : 'M') + p[0].toFixed(1) + ' ' + p[1].toFixed(1)).join(' ')}"
+            fill="none" stroke="${se.c}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>`;
+    se.pts.forEach((v, i) => {
+      if (v == null) return;
+      s += `<circle cx="${X(i)}" cy="${Y(v)}" r="4" fill="${se.c}" stroke="var(--card)" stroke-width="2"
+              data-tip="${tipHTML(se.k, [['Month ' + i, pct(v, 0)]])}"></circle>`;
+    });
+  });
+  /* Cohorts converge, so two end labels can land on the same pixel. Sort them and
+     push any pair closer than a line-height apart. */
+  const ends = series.map(se => {
+    const last = se.pts.map((v, i) => [v, i]).filter(p => p[0] != null).pop();
+    return last ? { se, x: X(last[1]), y: Y(last[0]) } : null;
+  }).filter(Boolean).sort((a, b) => a.y - b.y);
+  ends.forEach((e, i) => {
+    if (i > 0 && e.y - ends[i - 1].y < 14) e.y = ends[i - 1].y + 14;
+    s += `<text class="vlab" x="${e.x + 9}" y="${e.y + 4}" style="fill:${e.se.c}">${esc(e.se.k)}</text>`;
+  });
+  return s + '</svg>';
+}
+
+/* The inversion: rank on the left by cost per lead, rank on the right by cost per
+   retained dollar. Only the movers are coloured; flat series stay recessive. */
+function slope(left, right, opts = {}) {
+  const w = 700, rowH = 52, h = left.length * rowH + 54;
+  const x1 = 196, x2 = 504, top = 44;
+  const yOf = r => top + r * rowH;
+  const posR = {}; right.forEach((d, i) => posR[d.key] = i);
+  let s = `<svg class="chart" viewBox="0 0 ${w} ${h}" role="img" aria-label="${esc(opts.alt || '')}">`;
+  s += `<text class="axis" x="6" y="16" style="font-weight:590">${esc(opts.leftTitle)}</text>`;
+  s += `<text class="axis" x="${w - 6}" y="16" text-anchor="end" style="font-weight:590">${esc(opts.rightTitle)}</text>`;
+  s += `<line class="gridline" x1="${x1}" y1="${top - 14}" x2="${x1}" y2="${h - 16}"></line>`;
+  s += `<line class="gridline" x1="${x2}" y1="${top - 14}" x2="${x2}" y2="${h - 16}"></line>`;
+  left.forEach((d, i) => {
+    const j = posR[d.key], y1 = yOf(i), y2 = yOf(j);
+    const moved = i !== j;
+    const col = d.c || (moved ? 'var(--label-3)' : 'var(--fill-2)');
+    s += `<path d="M${x1} ${y1} C${x1 + 108} ${y1}, ${x2 - 108} ${y2}, ${x2} ${y2}" fill="none"
+            stroke="${col}" stroke-width="${d.hero ? 3.5 : 2}" stroke-linecap="round"
+            opacity="${d.hero ? 1 : .55}"></path>`;
+    s += `<circle cx="${x1}" cy="${y1}" r="${d.hero ? 5.5 : 4}" fill="${col}"></circle>`;
+    s += `<circle cx="${x2}" cy="${y2}" r="${d.hero ? 5.5 : 4}" fill="${col}"></circle>`;
+    const st = d.hero ? `fill:${col};font-weight:640` : '';
+    s += `<text class="axis-strong" x="${x1 - 14}" y="${y1 - 1}" text-anchor="end" style="${st}">${esc(d.k)}</text>`;
+    s += `<text class="axis" x="${x1 - 14}" y="${y1 + 14}" text-anchor="end" style="${d.hero ? 'fill:' + col : ''}">${esc(d.v)}</text>`;
+  });
+  right.forEach((d, j) => {
+    const y = yOf(j), col = d.c || 'var(--label-3)';
+    const st = d.hero ? `fill:${col};font-weight:640` : '';
+    s += `<text class="axis-strong" x="${x2 + 14}" y="${y - 1}" style="${st}">${esc(d.k)}</text>`;
+    s += `<text class="axis" x="${x2 + 14}" y="${y + 14}" style="${d.hero ? 'fill:' + col : ''}">${esc(d.v)}</text>`;
+  });
+  return s + '</svg>';
+}
+
+/* MRR movement: new and expansion above the axis, churn below it. */
+function mrrChart(rows, opts = {}) {
+  const w = 700, h = 260, padL = 54, padB = 40, padT = 14, padR = 8;
+  const maxUp = Math.max(...rows.map(r => r.new + r.expansion));
+  const maxDn = Math.max(...rows.map(r => -r.churn));
+  const span = Math.max(maxUp, maxDn) * 1.12 || 1;
+  const zero = padT + (h - padT - padB) / 2;
+  const scale = ((h - padT - padB) / 2) / span;
+  const bw = (w - padL - padR) / rows.length;
+  let s = `<svg class="chart" viewBox="0 0 ${w} ${h}" role="img" aria-label="${esc(opts.alt || '')}">`;
+  [1, .5, 0, -.5, -1].forEach(f => {
+    const y = zero - span * f * scale;
+    s += `<line class="gridline" x1="${padL}" y1="${y}" x2="${w - padR}" y2="${y}"
+            ${f === 0 ? 'style="stroke:var(--sep-strong)"' : ''}></line>`;
+    s += `<text class="axis" x="${padL - 8}" y="${y + 4}" text-anchor="end">${f === 0 ? '0' : '$' + Math.round(span * Math.abs(f) / 1000) + 'k'}</text>`;
+  });
+  rows.forEach((r, i) => {
+    const x = padL + i * bw + bw * 0.16, ww = bw * 0.68;
+    const hN = r.new * scale, hE = r.expansion * scale, hC = -r.churn * scale;
+    const t = tipHTML(r.month, [['New', money(r.new)], ['Expansion', money(r.expansion)],
+      ['Churn', '−' + money(Math.abs(r.churn))], ['Active subs', int(r.active)]]);
+    if (hN > 0) s += `<rect x="${x}" y="${zero - hN}" width="${ww}" height="${hN}" rx="3" fill="var(--c3)" data-tip="${t}"></rect>`;
+    if (hE > 0) s += `<rect x="${x}" y="${zero - hN - hE - 2}" width="${ww}" height="${hE}" rx="3" fill="var(--c2)" data-tip="${t}"></rect>`;
+    if (hC > 0) s += `<rect x="${x}" y="${zero + 2}" width="${ww}" height="${hC}" rx="3" fill="var(--bad)" data-tip="${t}"></rect>`;
+    if (i % 3 === 0) s += `<text class="axis" x="${x + ww / 2}" y="${h - padB + 18}" text-anchor="middle">${esc(r.month.slice(2))}</text>`;
+  });
+  return s + '</svg>';
+}
+
+/* The cost ladder: one metric per step, showing where the ranking flips. */
+function ladder(steps, chans) {
+  const w = 700, h = 250, padL = 8, padT = 30, padB = 34;
+  const colW = (w - padL - 16) / steps.length;
+  let s = `<svg class="chart" viewBox="0 0 ${w} ${h}" role="img" aria-label="Cost per funnel stage by channel">`;
+  steps.forEach((st, i) => {
+    const cx = padL + colW * i + colW / 2;
+    s += `<text class="axis" x="${cx}" y="16" text-anchor="middle" style="font-weight:590">${esc(st.label)}</text>`;
+    const vals = chans.map(c => st.get(c)).filter(v => v != null);
+    const max = Math.max(...vals);
+    const yOfC = c => padT + (h - padT - padB) * (st.get(c) / max);
+    chans.forEach(c => {
+      const v = st.get(c);
+      if (v == null) return;
+      s += `<circle cx="${cx}" cy="${yOfC(c)}" r="${c.hero ? 6 : 4}" fill="${c.c}" opacity="${c.hero ? 1 : .45}"
+              data-tip="${tipHTML(c.label, [[st.label, st.fmt(v)]])}"></circle>`;
+    });
+    /* Hero value labels are drawn after the marks and pushed apart when two of them
+       land on top of each other, which they do wherever the lines cross. */
+    const heroes = chans.filter(c => c.hero && st.get(c) != null)
+      .map(c => ({ c, y: yOfC(c) })).sort((a, b) => a.y - b.y);
+    heroes.forEach((hh, n) => {
+      let dy = -12;
+      if (n > 0 && hh.y - heroes[n - 1].y < 22) dy = 18;
+      s += `<text class="vlab" x="${cx}" y="${hh.y + dy}" text-anchor="middle"
+              style="fill:${hh.c.c}">${esc(st.fmt(st.get(hh.c)))}</text>`;
+    });
+  });
+  chans.filter(c => c.hero).forEach(c => {
+    const pts = steps.map((st, i) => {
+      const v = st.get(c); if (v == null) return null;
+      const vals = chans.map(x => st.get(x)).filter(x => x != null);
+      return [padL + colW * i + colW / 2, padT + (h - padT - padB) * (v / Math.max(...vals))];
+    }).filter(Boolean);
+    s += `<path d="${pts.map((p, i) => (i ? 'L' : 'M') + p[0] + ' ' + p[1]).join(' ')}" fill="none"
+            stroke="${c.c}" stroke-width="2.5" stroke-linecap="round" opacity=".85"></path>`;
+  });
+  s += `<text class="axis" x="${padL}" y="${h - 8}" style="fill:var(--label-3)">Each column scaled to its own worst value · lower is better</text>`;
+  return s + '</svg>';
+}
+</script>
+
+<script>
+/* ============================================================ shared pieces */
+const card = (title, dek, body, note) =>
+  `<div class="card"><div class="card-h"><h2>${title}</h2>${dek ? `<p>${dek}</p>` : ''}</div>
+   <div class="card-b">${body}</div>${note ? noteEl(note) : ''}</div>`;
+const noteEl = t => `<div class="note"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor"
+  stroke-width="1.6"><circle cx="8" cy="8" r="6.6"/><path d="M8 7.2v4M8 4.9v.1" stroke-linecap="round"/></svg>
+  <div>${t}</div></div>`;
+const paid = D.channels.filter(c => c.paid);
+const byCh = Object.fromEntries(D.channels.map(c => [c.channel, c]));
+const HERO = { meta_ads: 'var(--bad)', rb2b_visitor_id: 'var(--good)' };
+const SEQ = ['var(--seq1)', 'var(--seq2)', 'var(--seq3)', 'var(--seq4)'];
+const HOT = ['var(--hot1)', 'var(--hot2)', 'var(--hot3)', 'var(--hot4)'];
+
+/* ============================================================ Overview */
+function renderOverview() {
+  const k = D.kpis;
+  const kpis = [
+    ['Media spend', money(k.spend), '18 months, five channels'],
+    ['Leads', int(k.leads), `${int(k.demos_booked)} booked a demo`],
+    ['Closed won', int(k.won), `${pct(k.won / k.leads, 1)} of leads`],
+    ['Live MRR', money(k.live_mrr), `${int(k.active_subs)} of ${int(k.total_subs)} still billing`],
+    ['Blended CAC', money(k.blended_cac), 'spend ÷ closed won'],
+    ['Per $1 retained', money2(k.cost_per_retained), 'spend ÷ live MRR', true],
+  ].map(([l, v, d, a]) => `<div class="kpi${a ? ' accent' : ''}"><div class="l">${l}</div>
+      <div class="v">${v}</div><div class="d">${d}</div></div>`).join('');
+
+  const rankCPL = [...paid].sort((a, b) => a.cpl - b.cpl);
+  const rankRet = [...paid].sort((a, b) => a.cost_per_retained - b.cost_per_retained);
+  const mk = c => ({
+    key: c.channel, k: c.label, c: HERO[c.channel], hero: !!HERO[c.channel],
+  });
+  const inv = slope(
+    rankCPL.map(c => ({ ...mk(c), v: money(c.cpl) })),
+    rankRet.map(c => ({ ...mk(c), v: money2(c.cost_per_retained) })),
+    { leftTitle: 'CHEAPEST LEAD', rightTitle: 'CHEAPEST RETAINED DOLLAR',
+      alt: 'Channel rank by cost per lead versus cost per retained dollar; Meta falls from first to last.' });
+
+  const spread = (byCh.meta_ads.cost_per_retained / byCh.rb2b_visitor_id.cost_per_retained).toFixed(0);
+
+  const lad = ladder([
+    { label: 'Per lead', get: c => byCh[c.channel].cpl, fmt: v => money(v) },
+    { label: 'Per demo held', get: c => byCh[c.channel].cost_per_held, fmt: v => money(v) },
+    { label: 'Per closed won', get: c => byCh[c.channel].cac, fmt: v => money(v) },
+    { label: 'Per $1 retained MRR', get: c => byCh[c.channel].cost_per_retained, fmt: v => money2(v) },
+  ], paid.map(c => ({ ...c, c: HERO[c.channel] || 'var(--label-3)', hero: !!HERO[c.channel] })));
+
+  const chanTable = `<div class="tw"><table><thead><tr>
+    <th>Channel</th><th class="n">Spend</th><th class="n">Leads</th><th class="n">Cost / lead</th>
+    <th class="n">Demos held</th><th class="n">Won</th><th class="n">CAC</th>
+    <th class="n">Avg silos</th><th class="n">Live MRR</th><th class="n">Per $1 retained</th></tr></thead>
+    <tbody>${D.channels.map(c => `<tr>
+      <td class="strong">${esc(c.label)}${!c.paid ? ' <span class="pill mute">no spend</span>' : ''}</td>
+      <td class="n">${c.paid ? money(c.spend) : '<span class="dash">—</span>'}</td>
+      <td class="n">${int(c.leads)}</td>
+      <td class="n">${c.cpl == null ? '<span class="dash">—</span>' : money(c.cpl)}</td>
+      <td class="n">${int(c.held)}</td><td class="n">${int(c.won)}</td>
+      <td class="n">${c.cac == null ? '<span class="dash">—</span>' : money(c.cac)}</td>
+      <td class="n">${c.avg_silos.toFixed(1)}</td>
+      <td class="n">${money(c.live_mrr)}</td>
+      <td class="n"><span class="pill ${c.channel === 'meta_ads' ? 'bad' : c.channel === 'rb2b_visitor_id' ? 'good' : 'mute'}">
+        ${c.cost_per_retained == null ? '—' : money2(c.cost_per_retained)}</span></td>
+    </tr>`).join('')}</tbody></table></div>`;
+
+  const bands = barsV(D.silo_bands.map((b, i) => ({
+    k: b.band, k2: `${int(b.leads)} leads`, v: b.close_rate, c: SEQ[i],
+    tip: tipHTML(`${b.band} siloed sources`, [['Leads', int(b.leads)], ['Won', int(b.won)],
+      ['Close rate', pct(b.close_rate, 1)], ['Avg deal MRR', money(b.avg_mrr)]]),
+  })), { alt: 'Close rate rises with the number of siloed sources', w: 520, h: 230 });
+
+  const tierMix = D.silo_bands.map(b => {
+    const tot = Object.values(b.tiers).reduce((a, x) => a + x, 0) || 1;
+    const order = ['Starter', 'Growth', 'Enterprise'];
+    const cols = { Starter: 'var(--seq1)', Growth: 'var(--seq3)', Enterprise: 'var(--seq4)' };
+    return `<div class="row"><div class="rl"><div>${b.band} sources</div>
+      <div class="sub">${int(b.won)} won · avg ${money(b.avg_mrr)} MRR</div></div>
+      <div style="flex:1.4;display:flex;height:11px;border-radius:6px;overflow:hidden;gap:2px">
+        ${order.filter(t => b.tiers[t]).map(t => `<div style="flex:${b.tiers[t] / tot};background:${cols[t]}"
+          data-tip="${tipHTML(b.band + ' sources', [[t, int(b.tiers[t])]])}"></div>`).join('')}
+      </div></div>`;
+  }).join('');
+
+  const churn = D.churn_reasons.map(c => `<div class="row">
+    <div class="rl">${esc(c.reason)}</div>
+    <div class="rv">${int(c.subs)} <span style="color:var(--label-3);font-weight:400">
+      (${pct(c.subs / D.churned_total, 0)})</span></div></div>`).join('');
+
+  return [
+    `<div class="kpis">${kpis}</div>`,
+    card('The ranking inverts',
+      `Meta buys the cheapest lead and the most expensive retained dollar — a ${spread}× spread. Only the channels that move are coloured.`,
+      inv,
+      `Organic is excluded from every cost metric: it has ${int(byCh.organic.leads)} leads and no spend rows, so cost per anything is undefined rather than zero. <b>Retained MRR</b> is the latest invoice per subscription where the status is active or past due.`),
+    card('Where the flip happens',
+      'Following the same five channels down the funnel. Meta leads on cost per lead and has already lost by the time a demo is held.',
+      lad),
+    `<div class="card"><div class="card-h"><h2>Every channel, end to end</h2></div>
+      <div class="card-b tight">${chanTable}</div></div>`,
+    `<div class="two">
+      ${card('Why it inverts', 'The number of siloed tools a company runs is the hinge. It drives close rate, the tier they buy, and whether they stay.', bands)}
+      <div class="card"><div class="card-h"><h2>What they buy, by silo count</h2>
+        <p>Companies with few silos buy Starter and leave; the ones with many buy Growth and Enterprise.</p></div>
+        <div class="rows" style="margin-top:8px">${tierMix}</div>
+        <div class="note" style="margin-top:6px"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="8" cy="8" r="6.6"/><path d="M8 7.2v4M8 4.9v.1" stroke-linecap="round"/></svg>
+        <div>Starter <span class="swatch" style="display:inline-block;background:var(--seq1)"></span> ·
+        Growth <span class="swatch" style="display:inline-block;background:var(--seq3)"></span> ·
+        Enterprise <span class="swatch" style="display:inline-block;background:var(--seq4)"></span></div></div>
+      </div></div>`,
+    `<div class="card"><div class="card-h"><h2>Why customers cancel</h2>
+      <p>${int(D.churned_total)} cancelled subscriptions, counted once each rather than once per invoice month.</p></div>
+      <div class="rows" style="margin-top:10px">${churn}</div></div>`,
+  ].join('');
+}
+
+/* ============================================================ Channels */
+function renderChannels() {
+  const funnel = D.channels.map(c => {
+    const steps = [c.leads, c.booked, c.held, c.won];
+    const max = Math.max(...D.channels.map(x => x.leads));
+    const W = 470;
+    const seg = steps.map((v, i) => ({ v, w: (v / max) * W, c: SEQ[i] }));
+    return `<div class="row"><div class="rl" style="flex:0 0 116px">
+        <div>${esc(c.label)}</div><div class="sub">${pct(c.won / c.leads, 1)} lead → won</div></div>
+      <div style="flex:1;display:flex;gap:2px;align-items:center">
+        ${seg.map((s, i) => `<div style="width:${Math.max(s.w, 3)}px;height:22px;background:${s.c};
+          border-radius:${i === 0 ? '4px 2px 2px 4px' : i === 3 ? '2px 4px 4px 2px' : '2px'}"
+          data-tip="${tipHTML(c.label, [[['Leads', 'Booked a demo', 'Held a demo', 'Closed won'][i], int(s.v)]])}"></div>`).join('')}
+        <div style="margin-left:10px;font-size:12.5px;color:var(--label-2);font-variant-numeric:tabular-nums">
+          ${int(c.leads)} → ${int(c.won)}</div>
+      </div></div>`;
+  }).join('');
+
+  const rows = [...D.campaigns].sort((a, b) => (b.live_mrr) - (a.live_mrr));
+  const campTable = `<div class="tw"><table id="camp"><thead><tr>
+    <th>Campaign</th><th>Channel</th><th class="n">Spend</th><th class="n">Leads</th>
+    <th class="n">Cost / lead</th><th class="n">Won</th><th class="n">Live MRR</th>
+    <th class="n">Per $1 retained</th></tr></thead><tbody>
+    ${rows.map(c => `<tr>
+      <td class="strong">${esc(c.name)}</td><td>${esc(c.label)}</td>
+      <td class="n">${money(c.spend)}</td><td class="n">${int(c.leads)}</td>
+      <td class="n">${money(c.cpl)}</td><td class="n">${int(c.won)}</td>
+      <td class="n">${money(c.live_mrr)}</td>
+      <td class="n">${c.cost_per_retained == null
+        ? '<span class="pill mute">no retained MRR</span>'
+        : `<span class="pill ${c.cost_per_retained < 1 ? 'good' : c.cost_per_retained > 3 ? 'bad' : 'mute'}">${money2(c.cost_per_retained)}</span>`}</td>
+    </tr>`).join('')}</tbody></table></div>`;
+
+  /* Small multiples: one sparkline per channel, each a single hue, so no shared
+     categorical palette is needed to tell five trend lines apart. */
+  const weeks = [...new Set(D.weekly.map(w => w.week))].sort();
+  const sparks = paid.map(c => {
+    const series = weeks.map(w => D.weekly.find(x => x.channel === c.channel && x.week === w));
+    const vals = series.map(s => s && s.cpl != null ? s.cpl : null);
+    const has = vals.filter(v => v != null);
+    const max = Math.max(...has), min = Math.min(...has);
+    const W = 240, H = 54;
+    const pts = vals.map((v, i) => v == null ? null :
+      [(i / (weeks.length - 1)) * W, H - ((v - min) / ((max - min) || 1)) * (H - 8) - 4]).filter(Boolean);
+    const col = HERO[c.channel] || 'var(--label-3)';
+    return `<div style="padding:12px 0;border-top:.5px solid var(--sep)">
+      <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:5px">
+        <div style="font-size:13.5px;font-weight:590">${esc(c.label)}</div>
+        <div style="font-size:12.5px;color:var(--label-2);font-variant-numeric:tabular-nums">
+          median week ${money(has.sort((a, b) => a - b)[Math.floor(has.length / 2)])} / lead</div></div>
+      <svg class="chart" viewBox="0 0 ${W} ${H}" style="height:${H}px" preserveAspectRatio="none"
+        role="img" aria-label="Weekly cost per lead for ${esc(c.label)}">
+        <path d="${pts.map((p, i) => (i ? 'L' : 'M') + p[0].toFixed(1) + ' ' + p[1].toFixed(1)).join(' ')}"
+          fill="none" stroke="${col}" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"
+          vector-effect="non-scaling-stroke"/>
+      </svg></div>`;
+  }).join('');
+
+  return [
+    card('The funnel, by channel',
+      'Lead → booked a demo → held it → closed. Each channel is direct-laballed, so colour marks the funnel stage rather than the channel.',
+      `<div class="rows" style="margin:-8px -20px 0">${funnel}</div>
+       <div class="legend" style="padding-left:2px">
+        ${['Leads', 'Booked', 'Held', 'Won'].map((l, i) =>
+        `<span class="li"><span class="swatch" style="background:${SEQ[i]}"></span>${l}</span>`).join('')}</div>`,
+      `RB2B converts <b>${pct(byCh.rb2b_visitor_id.won / byCh.rb2b_visitor_id.held, 0)}</b> of held demos against Meta's <b>${pct(byCh.meta_ads.won / byCh.meta_ads.held, 0)}</b>. RB2B leads never submit a form — they are identified anonymous traffic, so a funnel gated on form submission would drop the best channel entirely.`),
+    `<div class="card"><div class="card-h"><h2>All ${D.campaigns.length} campaigns</h2>
+      <p>Sorted by the revenue still billing today, not by what they cost.</p></div>
+      <div class="card-b tight">${campTable}</div></div>`,
+    card('Cost per lead over time',
+      'One panel per channel rather than five lines on shared axes. Each panel is scaled to its own range, so compare the shape across panels, never the height.',
+      `<div style="margin-top:-10px">${sparks}</div>`),
+  ].join('');
+}
+
+/* ============================================================ Sales */
+function renderSales() {
+  const ns = barsV(D.noshow_bands.map((b, i) => ({
+    k: b.band, k2: `${int(b.meetings)} meetings`, v: b.rate, c: HOT[i + 1],
+    tip: tipHTML(b.band + ' out', [['Meetings', int(b.meetings)], ['No-shows', int(b.no_shows)],
+      ['Rate', pct(b.rate, 1)]]),
+  })), { alt: 'No-show rate rises with booking lead time', w: 470, h: 230 });
+
+  const day = barsV(D.noshow_by_day.map(d => ({
+    k: String(d.day), v: d.rate, c: 'var(--hot3)',
+    lab: '', tip: tipHTML(`Booked ${d.day} day${d.day === 1 ? '' : 's'} out`,
+      [['Meetings', int(d.meetings)], ['No-show rate', pct(d.rate, 1)]]),
+  })), { alt: 'No-show rate by exact booking lead time in days', w: 470, h: 200 });
+
+  const ds = D.demo_shown;
+  const shown = barsV([
+    { k: 'Sample shown', k2: `${int(ds.shown.leads)} leads`, v: ds.shown.rate, c: 'var(--good)',
+      tip: tipHTML('Sample dashboard shown', [['Leads', int(ds.shown.leads)], ['Won', int(ds.shown.won)], ['Close rate', pct(ds.shown.rate, 1)]]) },
+    { k: 'Never shown', k2: `${int(ds.not_shown.leads)} leads`, v: ds.not_shown.rate, c: 'var(--fill-2)',
+      tip: tipHTML('Never shown', [['Leads', int(ds.not_shown.leads)], ['Won', int(ds.not_shown.won)], ['Close rate', pct(ds.not_shown.rate, 1)]]) },
+  ], { alt: 'Close rate roughly doubles when the sample dashboard is shown', w: 400, h: 230 });
+
+  const repTable = `<div class="tw"><table><thead><tr>
+    <th>Rep</th><th class="n">Meetings</th><th class="n">Held</th><th class="n">No-show rate</th>
+    <th class="n">Shows the sample</th><th class="n">Close rate</th></tr></thead><tbody>
+    ${[...D.reps].sort((a, b) => b.shown_rate - a.shown_rate).map(r => `<tr>
+      <td class="strong">${esc(r.rep)}</td><td class="n">${int(r.meetings)}</td>
+      <td class="n">${int(r.held)}</td><td class="n">${pct(r.no_show_rate, 0)}</td>
+      <td class="n"><span class="pill ${r.shown_rate > .6 ? 'good' : r.shown_rate < .4 ? 'bad' : 'warn'}">${pct(r.shown_rate, 0)}</span></td>
+      <td class="n">${pct(r.close_rate, 0)}</td></tr>`).join('')}</tbody></table></div>`;
+
+  const obj = barsH(D.objections.slice(0, 8).map(o => ({
+    k: o.objection, v: o.n, c: 'var(--c2)',
+    tip: tipHTML(o.objection, [['Raised in', int(o.n) + ' meetings']]),
+  })), { w: 640, labelW: 210, alt: 'Most common objections raised on calls' });
+
+  return [
+    `<div class="two">
+      ${card('Booking further out loses the meeting',
+        'No-show rate by how many days ahead the meeting was booked. Monotonic at every individual day value, not just in bands.',
+        ns,
+        'The fix is scheduling, not selling: meetings booked within two days show up <b>six times</b> more reliably than those booked a week out.')}
+      ${card('Showing the sample roughly doubles the close rate',
+        esc(ds.method),
+        shown,
+        `Counting differently moves the magnitude but not the direction: meeting-level gives ${esc(ds.alternatives.meeting_level)}, last-held-meeting gives ${esc(ds.alternatives.last_held_meeting)}.`)}
+    </div>`,
+    card('No-show rate by exact lead time',
+      'Every booking-lead-time value with at least five meetings. The trend is not an artefact of the bands above.',
+      day),
+    `<div class="card"><div class="card-h"><h2>Rep scorecard</h2>
+      <p>Sample-dashboard usage ranges from ${pct(Math.min(...D.reps.map(r => r.shown_rate)), 0)} to ${pct(Math.max(...D.reps.map(r => r.shown_rate)), 0)} across the team — a habit, not a talent.</p></div>
+      <div class="card-b tight">${repTable}</div></div>`,
+    card('What comes up on calls', 'Objections recorded across all held meetings.', obj),
+  ].join('');
+}
+
+/* ============================================================ Revenue */
+function renderRevenue() {
+  const curves = lines(Object.entries(D.curves_by_sources).map(([b, pts], i) => ({
+    k: b, pts, c: SEQ[i],
+  })), { alt: 'Retention curves by number of connected sources', w: 640, h: 260 })
+    + `<div class="legend">${Object.keys(D.curves_by_sources).map((b, i) =>
+      `<span class="li"><span class="swatch" style="background:${SEQ[i]}"></span>${b} connected sources</span>`).join('')}</div>`;
+
+  const retCh = barsH(D.retention_by_channel.filter(r => r.rate != null)
+    .sort((a, b) => b.rate - a.rate).map(r => ({
+      k: r.label, v: r.rate, lab: pct(r.rate, 0),
+      c: HERO[r.channel] || 'var(--c2)',
+      tip: tipHTML(r.label, [['Eligible subs', int(r.eligible)], ['Still billing at 6mo', int(r.retained)], ['Rate', pct(r.rate, 0)]]),
+    })), { w: 560, labelW: 116, valueW: 56, alt: 'Six-month retention by channel' });
+
+  const atRisk = D.accounts.rows.filter(r => r[15] > 0).length;
+  const past = D.mrr_movement[D.mrr_movement.length - 1];
+
+  return [
+    card('Retention tracks connected sources, not much else',
+      'Share of each cohort still billing, by month since their first invoice.',
+      curves,
+      `Tenure-normalised: a subscription only enters the month-${'N'} figure if it started at least N months before ${esc(D.meta.window_end)}. Without that correction the earliest-starting channel always looks the worst.`),
+    `<div class="two">
+      ${card('Six-month retention by channel',
+        'Restricted to subscriptions with a full six months of runway inside the window.',
+        retCh)}
+      ${card('Retention at six months, by connected sources',
+        'The same cohorts cut by how many tools the customer actually connected.',
+        barsH(D.retention_by_sources.map((r, i) => ({
+          k: r.band + ' sources', v: r.rate ?? 0, lab: pct(r.rate, 0), c: SEQ[i],
+          tip: tipHTML(r.band + ' connected sources', [['Eligible', int(r.eligible)], ['Retained', int(r.retained)]]),
+        })), { w: 520, labelW: 128, valueW: 56, alt: 'Six-month retention by connected sources' }))}
+    </div>`,
+    card('MRR movement',
+      'New and expansion above the line, churn below it, by billing month.',
+      mrrChart(D.mrr_movement, { alt: 'Monthly MRR movement' }) +
+      `<div class="legend">
+        <span class="li"><span class="swatch" style="background:var(--c3)"></span>New</span>
+        <span class="li"><span class="swatch" style="background:var(--c2)"></span>Expansion</span>
+        <span class="li"><span class="swatch" style="background:var(--bad)"></span>Churn</span></div>`,
+      `Latest month (${esc(past.month)}): <b>${money(past.new)}</b> new and <b>${money(past.expansion)}</b> expansion against <b>${money(Math.abs(past.churn))}</b> churned, ending at <b>${money(past.ending_mrr)}</b> across ${int(past.active)} subscriptions.`),
+    `<div class="card"><div class="card-h"><h2>Book of business</h2>
+      <p>${int(atRisk)} accounts are billing today out of ${int(D.kpis.total_subs)} that ever started.</p></div>
+      <div class="rows" style="margin-top:10px">
+        ${[['Active subscriptions', int(D.kpis.active_subs)],
+           ['Cancelled', int(D.churned_total)],
+           ['Live MRR', money(D.kpis.live_mrr)],
+           ['Annualised run rate', money(D.kpis.live_mrr * 12)]]
+        .map(([l, v]) => `<div class="row"><div class="rl">${l}</div><div class="rv">${v}</div></div>`).join('')}
+      </div></div>`,
+  ].join('');
+}
+</script>
+
+<script>
+/* ============================================================ Accounts */
+const A = D.accounts.rows, AC = {};
+D.accounts.cols.forEach((c, i) => AC[c] = i);
+const acctState = { q: '', ch: '', stage: '', sort: 'live_mrr', dir: -1, shown: 60 };
+
+function filtered() {
+  const q = acctState.q.trim().toLowerCase();
+  let rows = A.filter(r =>
+    (!acctState.ch || r[AC.channel] === acctState.ch) &&
+    (!acctState.stage || r[AC.stage] === acctState.stage) &&
+    (!q || r[AC.company].toLowerCase().includes(q) || r[AC.domain].toLowerCase().includes(q) ||
+      r[AC.contact].toLowerCase().includes(q) || r[AC.industry].toLowerCase().includes(q) ||
+      r[AC.lead_id].toLowerCase().includes(q)));
+  const i = AC[acctState.sort];
+  rows.sort((a, b) => {
+    const x = a[i], y = b[i];
+    if (typeof x === 'number' && typeof y === 'number') return (x - y) * acctState.dir;
+    return String(x).localeCompare(String(y)) * acctState.dir;
+  });
+  return rows;
+}
+
+const STAGE_PILL = { closed_won: 'good', closed_lost: 'bad', contacted: 'warn', new: 'mute' };
+const STAGE_TXT = { closed_won: 'Won', closed_lost: 'Lost', contacted: 'Contacted', new: 'New' };
+
+function renderAccounts() {
+  const rows = filtered(), slice = rows.slice(0, acctState.shown);
+  const cols = [['company', 'Company', ''], ['contact', 'Contact', ''], ['channel', 'Channel', ''],
+    ['industry', 'Industry', ''], ['employees', 'Staff', 'n'], ['silos', 'Silos', 'n'],
+    ['stage', 'Stage', ''], ['live_mrr', 'Live MRR', 'n'], ['meetings', 'Meetings', 'n']];
+  const body = rows.length ? `<div class="tw"><table><thead><tr>
+      ${cols.map(([k, l, n]) => `<th class="${n} srt" data-sort="${k}"
+        ${acctState.sort === k ? `aria-sort="${acctState.dir > 0 ? 'ascending' : 'descending'}"` : ''}>${l}<span class="car">${acctState.sort === k ? (acctState.dir > 0 ? '▲' : '▼') : '▼'}</span></th>`).join('')}
+    </tr></thead><tbody>
+      ${slice.map(r => `<tr class="click" data-lead="${r[AC.lead_id]}">
+        <td class="strong">${esc(r[AC.company])}<div class="sub" style="font-size:12px;color:var(--label-2)">${esc(r[AC.domain])}</div></td>
+        <td>${esc(r[AC.contact])}<div class="sub" style="font-size:12px;color:var(--label-2)">${esc(r[AC.title])}</div></td>
+        <td>${esc(CH[r[AC.channel]] || r[AC.channel])}</td>
+        <td>${esc(r[AC.industry])}</td>
+        <td class="n">${int(r[AC.employees])}</td>
+        <td class="n">${int(r[AC.silos])}</td>
+        <td><span class="pill ${STAGE_PILL[r[AC.stage]]}">${STAGE_TXT[r[AC.stage]]}</span></td>
+        <td class="n">${r[AC.live_mrr] ? money(r[AC.live_mrr]) : '<span class="dash">—</span>'}</td>
+        <td class="n">${int(r[AC.meetings])}</td>
+      </tr>`).join('')}</tbody></table></div>
+      ${rows.length > acctState.shown ? `<div style="padding:0 20px 16px"><button class="more" id="more">Show ${int(Math.min(120, rows.length - acctState.shown))} more of ${int(rows.length - acctState.shown)} remaining</button></div>` : ''}`
+    : `<div class="empty">No accounts match those filters.</div>`;
+
+  return `<div class="card">
+    <div class="card-h"><h2>All ${int(A.length)} leads</h2>
+      <p>Every lead the five systems know about. Click any row for its full history — sessions, meetings and invoices.</p></div>
+    <div class="tools">
+      <div class="search"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7">
+        <circle cx="7.2" cy="7.2" r="4.6"/><path d="M10.6 10.6L14 14" stroke-linecap="round"/></svg>
+        <input id="q" type="search" placeholder="Search company, contact, domain or industry"
+          value="${esc(acctState.q)}" autocomplete="off"></div>
+      <select id="fch"><option value="">All channels</option>
+        ${Object.entries(CH).map(([k, v]) => `<option value="${k}" ${acctState.ch === k ? 'selected' : ''}>${esc(v)}</option>`).join('')}</select>
+      <select id="fst"><option value="">All stages</option>
+        ${Object.entries(STAGE_TXT).map(([k, v]) => `<option value="${k}" ${acctState.stage === k ? 'selected' : ''}>${esc(v)}</option>`).join('')}</select>
+      <span class="count">${int(rows.length)} of ${int(A.length)}</span>
+    </div>${body}</div>`;
+}
+
+function wireAccounts() {
+  const host = document.getElementById('accounts');
+  const q = host.querySelector('#q');
+  if (q) q.oninput = e => { acctState.q = e.target.value; acctState.shown = 60; paintAccounts(true); };
+  const fch = host.querySelector('#fch');
+  if (fch) fch.onchange = e => { acctState.ch = e.target.value; acctState.shown = 60; paintAccounts(); };
+  const fst = host.querySelector('#fst');
+  if (fst) fst.onchange = e => { acctState.stage = e.target.value; acctState.shown = 60; paintAccounts(); };
+  const more = host.querySelector('#more');
+  if (more) more.onclick = () => { acctState.shown += 120; paintAccounts(); };
+  host.querySelectorAll('th.srt').forEach(th => th.onclick = () => {
+    const k = th.dataset.sort;
+    if (acctState.sort === k) acctState.dir *= -1; else { acctState.sort = k; acctState.dir = -1; }
+    paintAccounts();
+  });
+  host.querySelectorAll('tr.click').forEach(tr => tr.onclick = () => openAccount(tr.dataset.lead));
+}
+function paintAccounts(keepFocus) {
+  const host = document.getElementById('accounts');
+  const pos = keepFocus ? host.querySelector('#q').selectionStart : null;
+  host.innerHTML = renderAccounts();
+  wireAccounts();
+  if (keepFocus) { const q = host.querySelector('#q'); q.focus(); q.setSelectionRange(pos, pos); }
+}
+
+/* ------------------------------------------------------------ account detail */
+function openAccount(id) {
+  const r = A.find(x => x[AC.lead_id] === id); if (!r) return;
+  const d = D.detail[id] || {};
+  const ev = [];
+  (d.sessions || []).forEach(s => ev.push({ at: s.at, t: `Visited ${s.page}`,
+    s: `${s.channel} · ${s.pages} pages · ${Math.round(s.secs / 60)} min${s.pricing ? ' · saw pricing' : ''}${s.rb2b ? ' · identified by RB2B' : ''}${s.form ? ' · submitted form' : ''}` }));
+  (d.meetings || []).forEach(m => ev.push({ at: m.at, t: `${m.type === 'discovery' ? 'Discovery call' : 'Walkthrough'} — ${m.status.replace('_', ' ')}`,
+    s: `${m.rep} · booked ${m.lead_time} days ahead${m.mins ? ' · ' + m.mins + ' min' : ''}${m.shown ? ' · showed the sample' : ''}${m.objection ? ' · “' + m.objection + '”' : ''}` }));
+  (d.invoices || []).forEach((v, i, arr) => {
+    if (i === 0) ev.push({ at: v.month, t: `Subscription started — ${v.tier}`, s: `${money(v.mrr)}/mo · ${v.sources} sources connected` });
+    else if (v.tier !== arr[i - 1].tier) ev.push({ at: v.month, t: `Upgraded to ${v.tier}`, s: `${money(v.mrr)}/mo · ${v.sources} sources` });
+    if (i === arr.length - 1 && v.sub_status === 'canceled') ev.push({ at: v.month, t: 'Cancelled', s: `after ${arr.length} invoices` });
+  });
+  ev.sort((a, b) => a.at.localeCompare(b.at));
+
+  const facts = [['Channel', CH[r[AC.channel]]], ['Siloed sources', int(r[AC.silos])],
+    ['Employees', int(r[AC.employees])], ['Stage', STAGE_TXT[r[AC.stage]]],
+    ['Live MRR', r[AC.live_mrr] ? money(r[AC.live_mrr]) : '—'], ['Owner', r[AC.owner] || '—']];
+
+  openSheet(esc(r[AC.company]), `
+    <div class="det-h">
+      <span class="pill ${STAGE_PILL[r[AC.stage]]}">${STAGE_TXT[r[AC.stage]]}</span>
+      <span class="pill mute">${esc(r[AC.industry])}</span>
+      ${r[AC.tier] ? `<span class="pill good">${esc(r[AC.tier])}</span>` : ''}
+      ${r[AC.reason] ? `<span class="pill bad">${esc(r[AC.reason])}</span>` : ''}
+    </div>
+    <p style="color:var(--label-2);font-size:13.5px;margin:6px 0 0">
+      ${esc(r[AC.contact])} · ${esc(r[AC.title])} · ${esc(r[AC.domain])}<br>
+      Arrived via ${esc(r[AC.campaign])} on ${esc(r[AC.created])}</p>
+    <div class="dl">${facts.map(([k, v]) => `<div><div class="k">${k}</div><div class="v">${v}</div></div>`).join('')}</div>
+    <div class="sect-lab">Timeline · ${ev.length} events</div>
+    <div class="tl">${ev.map(e => `<div class="ev"><div class="et">${esc(e.t)}</div>
+      <div class="es">${esc(e.at)} · ${esc(e.s)}</div></div>`).join('') || '<p style="color:var(--label-2)">No recorded activity.</p>'}</div>`);
+}
+
+/* ============================================================ sheet plumbing */
+const scrim = document.getElementById('scrim'), sheet = document.getElementById('sheet');
+const sheetB = document.getElementById('sheet-b'), sheetT = document.getElementById('sheet-t');
+let sheetMode = null;
+function openSheet(title, html, mode) {
+  sheetMode = mode || null;
+  sheetT.textContent = title.replace(/&amp;/g, '&');
+  sheetB.innerHTML = html;
+  scrim.hidden = false; sheet.hidden = false;
+  requestAnimationFrame(() => { scrim.classList.add('on'); sheet.classList.add('on'); });
+  document.body.style.overflow = 'hidden';
+  if (mode === 'ai') wireAI();
+}
+function closeSheet() {
+  scrim.classList.remove('on'); sheet.classList.remove('on');
+  document.body.style.overflow = '';
+  setTimeout(() => { scrim.hidden = true; sheet.hidden = true; }, 320);
+}
+scrim.onclick = closeSheet;
+document.getElementById('sheet-x').onclick = closeSheet;
+addEventListener('keydown', e => { if (e.key === 'Escape' && !sheet.hidden) closeSheet(); });
+
+/* ============================================================ navigation */
+const RENDER = { overview: renderOverview, channels: renderChannels, sales: renderSales,
+  revenue: renderRevenue, accounts: renderAccounts };
+const TITLES = {
+  overview: ['Overview', 'We spent ' + money(D.kpis.spend) + ' across five channels. This is which ones produced revenue that stuck.'],
+  channels: ['Channels', 'Where each channel wins and loses on the way from a click to a customer.'],
+  sales: ['Sales', 'Two things the team controls that move the close rate more than anything else.'],
+  revenue: ['Revenue', 'What is still billing, what churned, and the single variable that predicts both.'],
+  accounts: ['Accounts', 'Every lead across all five systems, joined into one record.'],
+};
+const painted = {};
+function show(name) {
+  Object.keys(RENDER).forEach(k => document.getElementById('s-' + k).hidden = k !== name);
+  document.querySelectorAll('.seg button').forEach(b =>
+    b.setAttribute('aria-selected', String(b.dataset.s === name)));
+  const [t, s] = TITLES[name];
+  document.getElementById('ttl').textContent = t;
+  document.getElementById('sub').textContent = s;
+  if (!painted[name]) {
+    document.getElementById(name).innerHTML = RENDER[name]();
+    painted[name] = true;
+    if (name === 'accounts') wireAccounts();
+  }
+  scrollTo({ top: 0, behavior: 'instant' });
+}
+document.querySelectorAll('.seg button').forEach(b => b.onclick = () => show(b.dataset.s));
+
+/* theme */
+const themeBtn = document.getElementById('theme');
+themeBtn.onclick = () => {
+  const cur = document.documentElement.getAttribute('data-theme');
+  const dark = cur ? cur === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches;
+  document.documentElement.setAttribute('data-theme', dark ? 'light' : 'dark');
+};
+
+document.getElementById('foot').innerHTML =
+  `${int(D.meta.total_rows)} rows across five systems · ${esc(D.meta.window_start)} to ${esc(D.meta.window_end)} ·
+   ad spend, GA4 sessions, CRM deals, booked meetings and Stripe invoices, joined on campaign, session and lead.<br>
+   Integrity checks at build time: ${D.canaries.map(c => esc(c.name) + ' ' + (c.pass ? '✓' : '✗')).join(' · ')}.
+   Fictional data — every person, company and domain is invented.`;
+
+show('overview');
+</script>
+
+<script>
+/* ============================================================ AI analyst
+   The dataset is 600 KB+; sample() accepts 65,536 bytes. So the aggregates travel
+   in the prompt (fast, one round) and the 903 lead rows stay in the page behind a
+   tool that Claude may call when a question actually needs them. */
+
+function buildBrief() {
+  const L = [];
+  const P = s => L.push(s);
+  P(`UNIFIED DASHBOARDS — marketing performance, ${D.meta.window_start} to ${D.meta.window_end}.`);
+  P(`Productized service: a done-for-you reporting dashboard built in 14 days. Pricing is fixed: Starter $2,400/mo, Growth $4,800/mo, Enterprise $9,500/mo. Not self-serve software.`);
+  P(`Totals: ${money(D.kpis.spend)} media spend, ${D.kpis.leads} leads, ${D.kpis.demos_booked} demos booked, ${D.kpis.meetings_held} meetings held, ${D.kpis.won} closed won, ${money(D.kpis.live_mrr)} MRR still billing across ${D.kpis.active_subs} of ${D.kpis.total_subs} subscriptions. Blended CAC ${money(D.kpis.blended_cac)}. Spend per $1 of retained MRR ${money2(D.kpis.cost_per_retained)}.`);
+
+  P(`\nCHANNELS (spend | leads | cost/lead | demos held | cost/held | won | CAC | avg siloed sources | live MRR | spend per $1 retained MRR):`);
+  D.channels.forEach(c => P(`- ${c.label}: ${c.paid ? money(c.spend) : 'no spend rows'} | ${c.leads} | ${c.cpl == null ? 'n/a' : money(c.cpl)} | ${c.held} | ${c.cost_per_held == null ? 'n/a' : money(c.cost_per_held)} | ${c.won} | ${c.cac == null ? 'n/a' : money(c.cac)} | ${c.avg_silos} | ${money(c.live_mrr)} | ${c.cost_per_retained == null ? 'n/a' : money2(c.cost_per_retained)}`));
+  P(`KEY FINDING: the ranking inverts. Meta is the cheapest lead (${money(byCh.meta_ads.cpl)}) and the most expensive retained dollar (${money2(byCh.meta_ads.cost_per_retained)}); RB2B is ${money(byCh.rb2b_visitor_id.cpl)} per lead and ${money2(byCh.rb2b_visitor_id.cost_per_retained)} per retained dollar.`);
+
+  P(`\nCAMPAIGNS (spend | leads | cost/lead | won | live MRR):`);
+  D.campaigns.forEach(c => P(`- ${c.name} [${c.label}]: ${money(c.spend)} | ${c.leads} | ${money(c.cpl)} | ${c.won} | ${money(c.live_mrr)}`));
+
+  P(`\nTHE CAUSAL HINGE — siloed_source_count, how many of 12 revenue tool categories a company runs (leads | won | close rate | avg deal MRR | tier mix):`);
+  D.silo_bands.forEach(b => P(`- ${b.band} sources: ${b.leads} | ${b.won} | ${pct(b.close_rate, 1)} | ${money(b.avg_mrr)} | ${JSON.stringify(b.tiers)}`));
+
+  P(`\nRETENTION at 6 months, tenure-normalised (only subscriptions with 6 months of runway before ${D.meta.window_end} are counted):`);
+  D.retention_by_sources.forEach(r => P(`- ${r.band} connected sources: ${pct(r.rate, 0)} (${r.retained} of ${r.eligible})`));
+  D.retention_by_channel.forEach(r => r.rate != null && P(`- ${r.label}: ${pct(r.rate, 0)} (${r.retained} of ${r.eligible})`));
+
+  P(`\nCHURN REASONS (${D.churned_total} cancelled subscriptions, counted once each):`);
+  D.churn_reasons.forEach(c => P(`- ${c.reason}: ${c.subs}`));
+
+  P(`\nSALES EXECUTION`);
+  P(`No-show rate by booking lead time: ` + D.noshow_bands.map(b => `${b.band} ${pct(b.rate, 1)} (${b.meetings} meetings)`).join(', ') + `. Monotonic at every individual day value.`);
+  P(`Sample dashboard shown -> close rate ${pct(D.demo_shown.shown.rate, 0)} (${D.demo_shown.shown.won}/${D.demo_shown.shown.leads}) vs never shown ${pct(D.demo_shown.not_shown.rate, 0)} (${D.demo_shown.not_shown.won}/${D.demo_shown.not_shown.leads}). Method: ${D.demo_shown.method} Other methods give ${D.demo_shown.alternatives.meeting_level} (meeting-level) and ${D.demo_shown.alternatives.last_held_meeting} (last held meeting).`);
+  P(`Reps (meetings | held | no-show rate | shows the sample | close rate):`);
+  D.reps.forEach(r => P(`- ${r.rep}: ${r.meetings} | ${r.held} | ${pct(r.no_show_rate, 0)} | ${pct(r.shown_rate, 0)} | ${pct(r.close_rate, 0)}`));
+  P(`Objections raised: ` + D.objections.map(o => `${o.objection} (${o.n})`).join(', ') + `.`);
+  P(`Loss reasons on closed-lost deals only: ` + D.lost_reasons.map(o => `${o.reason} (${o.n})`).join(', ') + `.`);
+
+  P(`\nMRR MOVEMENT by month (new | expansion | churn | ending MRR | active subs):`);
+  D.mrr_movement.forEach(m => P(`- ${m.month}: ${money(m.new)} | ${money(m.expansion)} | ${money(m.churn)} | ${money(m.ending_mrr)} | ${m.active}`));
+
+  P(`\nINDUSTRIES (leads | won | avg siloed sources):`);
+  D.industries.forEach(i => P(`- ${i.industry}: ${i.leads} | ${i.won} | ${i.avg_silos}`));
+
+  P(`\nWEB: ${D.web.sessions} sessions, ${D.web.identified_leads} tied to a lead, ${D.web.anonymous} anonymous, ${D.web.form_submitted} submitted a form, ${D.web.rb2b_identified} identified by RB2B of which ${D.web.rb2b_with_form} submitted a form.`);
+  P(`Landing pages: ` + D.web.landing_pages.map(p => `${p.page} (${p.sessions} sessions, ${p.leads} leads)`).join(', ') + `.`);
+
+  P(`\nCAVEATS you must respect when answering:`);
+  P(`1. Instantly and RB2B have no impressions/clicks/CPC — those fields are blank, not zero. Never average them as zero.`);
+  P(`2. Retention figures above are already tenure-normalised. Raw cancellation rates would rank the earliest-starting channel worst.`);
+  P(`3. Organic has ${byCh.organic.leads} leads and no spend rows, so cost per lead, CAC and cost per retained dollar are undefined for it — not zero.`);
+  P(`4. RB2B leads never submit a form; they are identified anonymous traffic and still convert.`);
+  P(`5. The CRM records last-touch attribution: a lead's session is the LAST session before it converted, not the first.`);
+  P(`6. ${D.open_with_lost_reason} still-open deals carry a lost_reason like "Never booked a call". Loss reasons above already exclude them.`);
+  return L.join('\n');
+}
+
+const BRIEF = buildBrief();
+const SUGGESTED = [
+  'Why is Meta our worst channel if its leads are the cheapest?',
+  'Which rep should I coach first, and on what?',
+  'If I moved $20k out of Meta, where should it go?',
+  'What do the customers who churned have in common?',
+  'Show me the 8+ silo leads we lost and why',
+];
+
+let sampleFn = null, sampleReady = false, sampleTools = false;
+const askBtn = document.getElementById('askbtn');
+askBtn.disabled = true;
+
+(async () => {
+  try {
+    const s = await claude.use('sample');
+    if (!s) throw 0;
+    sampleFn = s;
+    try { sampleTools = !!(await s.limits()).tools; } catch (e) { sampleTools = false; }
+    sampleReady = true;
+    askBtn.disabled = false;
+  } catch (e) {
+    askBtn.disabled = true;
+    askBtn.title = 'The AI analyst is unavailable in this view.';
+  }
+})();
+
+let convo = [];       /* [{role, content}] as sent to sample() */
+let view = [];        /* [{who, text, tool}] as rendered */
+let busy = false, ctrl = null;
+
+askBtn.onclick = () => openSheet('Ask about this data', aiHTML(), 'ai');
+
+function aiHTML() {
+  const chips = view.length ? '' : `<div class="chips">${SUGGESTED.map(q =>
+    `<button class="chip" data-q="${esc(q)}">${esc(q)}</button>`).join('')}</div>`;
+  const thread = view.map(m => {
+    if (m.who === 'me') return `<div class="bubble me">${esc(m.text)}</div>`;
+    if (m.who === 'err') return `<div class="bubble ai err">${esc(m.text)}</div>`;
+    const tool = m.tool ? `<div class="toolrun">
+      <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.6">
+        <path d="M2 7h10M7 2v10" stroke-linecap="round"/></svg>
+      Queried the lead table · <code>${esc(m.tool)}</code></div>` : '';
+    return `<div>${tool}${m.text ? `<div class="bubble ai"${tool ? ' style="margin-top:8px"' : ''}>${fmt(m.text)}</div>`
+      : `<div class="bubble ai"><span class="thinking"><i></i><i></i><i></i></span></div>`}</div>`;
+  }).join('');
+  return `${chips}<div class="qa" id="qa">${thread}</div>
+    <form class="ask-form" id="af">
+      <textarea id="ai-in" rows="1" placeholder="Ask anything about these ${int(D.kpis.leads)} leads…"
+        ${busy ? 'disabled' : ''}></textarea>
+      <button class="send" id="ai-go" type="submit" aria-label="${busy ? 'Stop' : 'Send'}">
+        ${busy ? `<svg viewBox="0 0 18 18"><rect x="5" y="5" width="8" height="8" rx="1.6" fill="currentColor"/></svg>`
+        : `<svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M9 15V3M3.8 8.2L9 3l5.2 5.2"/></svg>`}
+      </button></form>
+    <div class="disclaim">Answers are generated from this dashboard's own figures. Check anything load-bearing.</div>`;
+}
+
+const fmt = t => esc(t)
+  .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+  .replace(/^[-•]\s+/gm, '· ');
+
+function repaintAI() {
+  if (sheetMode !== 'ai') return;
+  const box = document.getElementById('sheet-b');
+  const txt = box.querySelector('#ai-in');
+  const keep = txt ? txt.value : '';
+  box.innerHTML = aiHTML();
+  wireAI();
+  const nt = box.querySelector('#ai-in');
+  if (nt && !busy) { nt.value = keep; nt.focus(); }
+  const qa = box.querySelector('#qa');
+  if (qa) box.scrollTop = box.scrollHeight;
+}
+
+function wireAI() {
+  const box = document.getElementById('sheet-b');
+  box.querySelectorAll('.chip').forEach(c => c.onclick = () => ask(c.dataset.q));
+  const f = box.querySelector('#af');
+  if (!f) return;
+  const ta = box.querySelector('#ai-in');
+  ta.oninput = () => { ta.style.height = 'auto'; ta.style.height = Math.min(120, ta.scrollHeight) + 'px'; };
+  ta.onkeydown = e => {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); f.requestSubmit(); }
+  };
+  f.onsubmit = e => {
+    e.preventDefault();
+    if (busy) { if (ctrl) ctrl.abort(); return; }
+    const v = ta.value.trim(); if (v) ask(v);
+  };
+}
+
+/* The one tool: the lead table lives in the page, not in the prompt. */
+const ACCOUNT_TOOL = {
+  name: 'queryAccounts',
+  description: 'Search the 903 individual lead/company records behind this dashboard. Returns matching accounts with company, contact, channel, industry, employee count, siloed source count, deal stage, tier, MRR at close, MRR still billing, session and meeting counts, and loss reason. Use it for questions about specific companies or about subsets the aggregate brief does not already cover; the brief already has every channel, campaign, rep, cohort and month total.',
+  inputSchema: {
+    type: 'object',
+    properties: {
+      search: { type: 'string', description: 'Match against company name, domain, contact or industry' },
+      channel: { type: 'string', enum: Object.keys(CH) },
+      stage: { type: 'string', enum: ['new', 'contacted', 'closed_won', 'closed_lost'] },
+      industry: { type: 'string' },
+      min_silos: { type: 'number' }, max_silos: { type: 'number' },
+      billing_only: { type: 'boolean', description: 'Only accounts with MRR still billing' },
+      sort: { type: 'string', enum: ['live_mrr', 'silos', 'employees', 'created'] },
+      limit: { type: 'number', description: 'Max 40, default 15' },
+    },
+  },
+  execute(inp) {
+    const q = String(inp.search ?? '').toLowerCase();
+    let rows = A.filter(r =>
+      (!q || r[AC.company].toLowerCase().includes(q) || r[AC.domain].toLowerCase().includes(q) ||
+        r[AC.contact].toLowerCase().includes(q) || r[AC.industry].toLowerCase().includes(q)) &&
+      (!inp.channel || r[AC.channel] === inp.channel) &&
+      (!inp.stage || r[AC.stage] === inp.stage) &&
+      (!inp.industry || r[AC.industry].toLowerCase() === String(inp.industry).toLowerCase()) &&
+      (inp.min_silos == null || r[AC.silos] >= Number(inp.min_silos)) &&
+      (inp.max_silos == null || r[AC.silos] <= Number(inp.max_silos)) &&
+      (!inp.billing_only || r[AC.live_mrr] > 0));
+    const key = AC[inp.sort] ?? AC.live_mrr;
+    rows.sort((a, b) => typeof a[key] === 'number' ? b[key] - a[key] : String(a[key]).localeCompare(String(b[key])));
+    const total = rows.length;
+    const lim = Math.max(1, Math.min(40, Number(inp.limit) || 15));
+    return {
+      matched: total, returned: Math.min(lim, total),
+      accounts: rows.slice(0, lim).map(r => ({
+        company: r[AC.company], contact: r[AC.contact], title: r[AC.title],
+        channel: CH[r[AC.channel]], industry: r[AC.industry], employees: r[AC.employees],
+        siloed_sources: r[AC.silos], stage: r[AC.stage], tier: r[AC.tier] || null,
+        mrr_at_close: r[AC.mrr] || null, mrr_still_billing: r[AC.live_mrr] || null,
+        sessions: r[AC.sessions], meetings: r[AC.meetings], loss_reason: r[AC.reason] || null,
+      })),
+    };
+  },
+};
+
+const SYSTEM = `You are the analyst for this marketing dashboard. Answer strictly from the DATA BRIEF below and from the queryAccounts tool — never from outside knowledge, and never invent a figure.
+
+How to answer:
+- Lead with the answer in one sentence, then the evidence. Keep it under 180 words unless asked for more.
+- Quote real numbers from the brief and say which metric they are.
+- If something is genuinely not in the data, say so plainly and say what would be needed. Do not estimate.
+- Respect every caveat in the CAVEATS section; they are the difference between a right and a wrong answer here.
+- Use queryAccounts only for questions about individual companies or subsets the brief does not cover.
+- Plain prose. No markdown headers or tables. Bold at most a couple of key figures with **.
+
+DATA BRIEF
+${BRIEF}`;
+
+async function ask(q) {
+  if (busy || !sampleReady) return;
+  busy = true; ctrl = new AbortController();
+  view.push({ who: 'me', text: q });
+  const slot = { who: 'ai', text: '', tool: null };
+  view.push(slot);
+  repaintAI();
+
+  convo.push({ role: 'user', content: q });
+  const turns = [{ role: 'user', content: SYSTEM + '\n\nQUESTION: ' + q }];
+  if (convo.length > 1) {
+    turns.length = 0;
+    turns.push({ role: 'user', content: SYSTEM + '\n\nQUESTION: ' + convo[0].content });
+    for (let i = 1; i < convo.length; i++) turns.push(convo[i]);
+  }
+
+  const opts = {
+    signal: ctrl.signal,
+    modelTier: 'default',
+    onText: u => { slot.text = u.text; repaintAI(); },
+  };
+  if (sampleTools) {
+    opts.tools = [{ ...ACCOUNT_TOOL, execute: (i, c) => {
+      slot.tool = 'queryAccounts(' + Object.entries(i).map(([k, v]) => `${k}: ${JSON.stringify(v)}`).join(', ') + ')';
+      repaintAI();
+      return ACCOUNT_TOOL.execute(i, c);
+    } }];
+  }
+
+  try {
+    const res = await sampleFn(turns, opts);
+    slot.text = res.text;
+    convo.push({ role: 'assistant', content: res.text });
+  } catch (e) {
+    const code = e && e.code;
+    if (code === 'cancelled') {
+      slot.text = (e.text || slot.text || '').trim();
+      if (!slot.text) { view.splice(view.indexOf(slot), 1); }
+      else convo.push({ role: 'assistant', content: slot.text });
+    } else if (code === 'refused') {
+      view[view.indexOf(slot)] = { who: 'err', text: 'That question was declined. Try rephrasing it around the data on this dashboard.' };
+      convo.pop();
+    } else if (code === 'rate_limited') {
+      view[view.indexOf(slot)] = { who: 'err', text: 'Too many questions in a row. Give it a moment and ask again.' };
+      convo.pop();
+    } else if (code === 'not_granted' || code === 'sampling_disabled' || code === 'not_declared'
+      || code === 'capability_disabled' || code === 'capability_removed') {
+      view[view.indexOf(slot)] = { who: 'err', text: 'The AI analyst is not available in this view. Every figure it would cite is on the dashboard itself.' };
+      askBtn.disabled = true; sampleReady = false; convo.pop();
+    } else if (code === 'prompt_too_large') {
+      view[view.indexOf(slot)] = { who: 'err', text: 'This conversation got too long. Close and reopen to start a fresh one.' };
+      convo.pop();
+    } else {
+      const partial = (e && e.text || '').trim();
+      view[view.indexOf(slot)] = partial
+        ? { who: 'ai', text: partial + '\n\n[interrupted — ask again to retry]' }
+        : { who: 'err', text: 'That did not come back. Ask again to retry.' };
+      convo.pop();
+    }
+  } finally {
+    busy = false; ctrl = null; repaintAI();
+  }
+}
+</script>
