@@ -1,0 +1,93 @@
+{
+  "_comment": "Cold siblings of the approved warm-visitor variants in execution/visitor_identification/email_variants.json. Same ids, same `pain_move` text (that is the approved substance, and it never referred to the visit), following execution/shared/sales_frameworks/16_cold_lead.md — cold observation open, personalized pain hook, one-line solution, sample-dashboard CTA, 'how do you do it today' open door.",
+  "_comment_what_changed": "Differences from the warm file: (1) every approved_example opens on an observation instead of thanking someone for a visit; (2) every example ENDS ON THE CTA, because a cold message never carries a second ask (the warm 'or tell me what brought you to the site' is deleted, not replaced); (3) no example states how many tools or systems a company has, since the detected stack is partial and a count is an easy thing to be wrong about; (4) no em dashes anywhere; (5) ultra_short's pain_move said 'Warm open' and now says 'Cold open'. The examples reuse the same three prospects as the warm file so the two can be diffed side by side.",
+  "_comment_review": "These examples are DERIVED from approved warm copy, not themselves client-approved. Run generate_cold_variants-style review before trusting them at volume: build a batch, read it, replace these with the winners.",
+  "variants": [
+    {
+      "id": "stack_math",
+      "name": "Stack math",
+      "when_to_use": "Default. Works on any lead with 3+ detected sources.",
+      "pain_move": "Make the pain the disagreement between their systems. Name two or three of their actual tools and land that each one holds a different piece of the same answer, so a simple question ('how did last month actually go?') has no single source. NEVER state how many tools, systems or sources they have: the detected stack is only what is publicly visible, they run things we cannot see, and a specific number is both intrusive and probably wrong. Vague quantifiers only.",
+      "approved_examples": [
+        {
+          "written_for": "Priya at Ledgerline",
+          "subject": "ledgerline's revenue picture",
+          "body": "Hi Priya,\n\nSalesforce, Marketo and Google Analytics 4 each hold a piece of Ledgerline's revenue picture, and none of them holds the whole thing. So \"how did last month actually go?\" gets a different answer depending on where you look.\n\nWe connect those into one view.\n\nWant me to send over a sample dashboard built on Ledgerline's stack?\n\nJose"
+        },
+        {
+          "written_for": "Devon at Kestrel Supply Co",
+          "subject": "kestrel supply's numbers",
+          "body": "Devon,\n\nHubSpot, Stripe and Mailchimp each hold part of Kestrel Supply's revenue picture. Ask something simple like \"how did last month actually go?\" and the answer depends entirely on which one you open first.\n\nWe make that a single number instead of an argument.\n\nCan I send over a sample dashboard built on your actual stack?\n\nJose"
+        }
+      ]
+    },
+    {
+      "id": "monday_scramble",
+      "name": "The Monday scramble",
+      "when_to_use": "Leads with no BI tool, where reporting is almost certainly manual.",
+      "pain_move": "Make the pain a recurring ritual with a time cost. Somebody on their team is exporting from their named tools and stitching it together by hand, on a schedule, forever. Anchor on the hours, not on a count of their systems. The waste is that it happens again next week.",
+      "approved_examples": [
+        {
+          "written_for": "Devon at Kestrel Supply Co",
+          "subject": "kestrel supply's weekly export",
+          "body": "Devon,\n\nWith HubSpot, Stripe and Mailchimp and nothing sitting over them, someone at Kestrel Supply is exporting and stitching that data together by hand. Then doing it again the following week.\n\nThere's a way to get those hours back.\n\nCan I send over a sample dashboard built on your actual stack?\n\nJose"
+        }
+      ],
+      "requires_bi": false
+    },
+    {
+      "id": "blind_spot",
+      "name": "Blind spot",
+      "when_to_use": "Leads that already own a BI tool — Looker, Tableau, Power BI, Mode, Metabase, Sigma.",
+      "pain_move": "Make the pain something their current setup structurally cannot see. They already have the dashboard; name the specific sources feeding it and the one that isn't, and what that costs them. Never imply they lack a dashboard — the gap is what it's connected to.",
+      "approved_examples": [
+        {
+          "written_for": "Nate at Alloy & Oak",
+          "subject": "what tableau isn't seeing at alloy & oak",
+          "body": "Nate,\n\nAlloy & Oak already has Tableau, so the dashboard isn't the problem. What feeds it is. If Shopify and Klaviyo are wired in but Meta Ads spend isn't, your blended acquisition cost is an estimate, and that's the number that sets budget.\n\nWe connect the sources Tableau isn't seeing.\n\nCan I send over a sample dashboard built on your stack?\n\nJose"
+        }
+      ],
+      "requires_bi": true
+    },
+    {
+      "id": "new_way",
+      "name": "There's a new way",
+      "when_to_use": "Closest to the Audience-Building DM's original register.",
+      "pain_move": "Use the playbook's own construction: a specific observation about their stack, then 'there's a new way for [their kind of company] to [specific benefit]' — and let the mechanism stay unexplained. The pull is curiosity about the mechanism, not a description of it.",
+      "approved_examples": [
+        {
+          "written_for": "Priya at Ledgerline",
+          "subject": "a new way for ledgerline's reporting",
+          "body": "Priya,\n\nSalesforce, Marketo and Google Analytics 4 all feed Ledgerline's reporting, and Looker sits on top of whichever of them got wired in first.\n\nThere's a new way for financial services teams to get every revenue source into one view without a data engineer touching it.\n\nCan I send over a sample dashboard built on Ledgerline's actual stack?\n\nJose"
+        }
+      ]
+    },
+    {
+      "id": "question_first",
+      "name": "Question first",
+      "when_to_use": "Higher reply rates when you want a conversation rather than a download.",
+      "pain_move": "Open the body with a genuine, specific question about their stack that only has one uncomfortable answer — e.g. which system they trust when two of their named tools disagree on the same number. The question does the work; do not answer it for them.",
+      "approved_examples": [
+        {
+          "written_for": "Priya at Ledgerline",
+          "subject": "which number does ledgerline trust?",
+          "body": "Priya,\n\nWhen Salesforce, Marketo and Google Analytics 4 disagree on the same number, which one does Ledgerline trust?\n\nMost teams have an answer, and it's usually whichever one finance already exported.\n\nWe make that a single source rather than a standing argument.\n\nCan I send over a sample dashboard built on Ledgerline's actual stack?\n\nJose"
+        }
+      ]
+    },
+    {
+      "id": "ultra_short",
+      "name": "Ultra short",
+      "when_to_use": "Founders and C-level, who reply to the shortest thing in the inbox.",
+      "pain_move": "Three or four lines total, under 45 words. Cold open, one line naming their tools and the consequence, the CTA. No solution paragraph at all: the offer of the sample dashboard IS the solution. Ruthless, every word must survive a cut test.",
+      "approved_examples": [
+        {
+          "written_for": "Nate at Alloy & Oak",
+          "subject": "alloy & oak's real cac",
+          "body": "Nate,\n\nShopify, Klaviyo and Meta Ads all hold a piece of what a customer actually costs Alloy & Oak, and none of them holds the answer.\n\nWant me to send over a sample dashboard built on your actual stack?\n\nJose"
+        }
+      ]
+    }
+  ],
+  "_comment_requires_bi": "`requires_bi` gates a variant on whether the lead already owns a BI tool, and is enforced for ROTATION as well as for routing. Without it, blind_spot ('you already have the dashboard, the gap is what feeds it') rotates onto leads with no BI tool and asserts something false, while the segment directive in the same prompt says the opposite. true = only BI owners, false = only non-owners, absent = any lead."
+}
