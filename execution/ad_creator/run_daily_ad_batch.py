@@ -4,7 +4,7 @@ Unattended daily entry point — invoked by launchd locally, or by a cloud
 routine's prompt, Monday-Friday. Fully deterministic — no LLM call in this
 generation path:
 
-  1. Look up today's weekday in execution/rotation_plan.json to pick a brand.
+  1. Look up today's weekday in execution/ad_creator/rotation_plan.json to pick a brand.
   2. Pick that brand's row-group by today's date modulo the group count —
      stateless on purpose: a cloud routine gets a fresh git clone every run,
      so there's no local disk to persist a counter on. Date math needs no
@@ -24,8 +24,11 @@ import json
 import sys
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parent.parent
-sys.path.insert(0, str(ROOT / "execution"))
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+from _paths import ROOT  # noqa: E402  (also puts every execution area on sys.path)
+
+# Data that belongs to this area lives beside it.
+HERE = Path(__file__).resolve().parent
 
 from generate_ad_creatives import build_gallery, load_brand  # noqa: E402
 
@@ -35,7 +38,7 @@ from generate_ad_creatives import build_gallery, load_brand  # noqa: E402
 # the Google-Drive MCP connector instead), and a module-level import would crash
 # the whole run before a single ad got generated.
 
-PLAN_PATH = ROOT / "execution" / "rotation_plan.json"
+PLAN_PATH = HERE / "rotation_plan.json"
 OUT_ROOT = ROOT / ".tmp" / "generated_ads"
 LOG_PATH = ROOT / ".tmp" / "daily_ad_batch.log"
 

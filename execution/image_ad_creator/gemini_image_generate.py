@@ -12,7 +12,7 @@ a generative image model):
     receives them as ordinary Content parts alongside the text prompt.
 
 CLI usage:
-    python execution/gemini_image_generate.py \
+    python execution/image_ad_creator/gemini_image_generate.py \
         --prompt "..." \
         --image path/to/product.png \
         --image path/to/style_ref.jpg \
@@ -26,8 +26,13 @@ Importable:
 
 import argparse
 import os
+import sys
+from pathlib import Path
 
 from dotenv import load_dotenv
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+from _paths import ROOT  # noqa: E402  (also puts every execution area on sys.path)
 
 # Confirmed against the installed google-genai SDK source (2.22.0): the
 # client.models.generate_content(...) path (not the newer client.interactions
@@ -46,7 +51,7 @@ def _get_client():
     # Explicit path, not a cwd-relative search: under launchd there is no shell
     # environment and the working directory can't be assumed, so a bare
     # load_dotenv() would silently find nothing and fail at auth time instead.
-    load_dotenv(os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), ".env"))
+    load_dotenv(ROOT / ".env")
     api_key = os.environ.get("GEMINI_API_KEY")
     if not api_key:
         raise RuntimeError("GEMINI_API_KEY not set in .env")

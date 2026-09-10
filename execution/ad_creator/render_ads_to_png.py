@@ -18,8 +18,8 @@ factor of 4, so text and the blurred gradient strokes rasterize crisply rather
 than being upscaled.
 
 Usage:
-    python3 execution/render_ads_to_png.py --input .tmp/ad_batches/x.json \
-        --out .tmp/generated_ads/x/png --brand execution/brands/leadforge.json
+    python3 execution/ad_creator/render_ads_to_png.py --input .tmp/ad_batches/x.json \
+        --out .tmp/generated_ads/x/png --brand execution/shared/brands/leadforge.json
 """
 
 import argparse
@@ -28,8 +28,8 @@ import os
 import sys
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parent.parent
-sys.path.insert(0, str(ROOT / "execution"))
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+from _paths import FONTS, ROOT  # noqa: E402  (also puts every execution area on sys.path)
 
 from generate_ad_creatives import CSS, build_cards, load_brand  # noqa: E402
 
@@ -38,7 +38,7 @@ PORTRAIT_H = 480
 SQUARE_H = 270
 SCALE = 4  # 270*4 = 1080, 480*4 = 1920
 
-FONT_DIR = ROOT / "execution" / "fonts"
+FONT_DIR = FONTS
 FONT_MANIFEST = FONT_DIR / "manifest.json"
 
 
@@ -48,13 +48,13 @@ def embedded_font_css():
     Rendering must not depend on fonts.googleapis.com: the cloud sandbox has
     allowlisted egress, and a blocked font request fails *silently* — the ads
     would render in a fallback serif and upload looking wrong. See
-    execution/fetch_fonts.py for how these files get here.
+    execution/ad_creator/fetch_fonts.py for how these files get here.
     """
     import base64
 
     if not FONT_MANIFEST.exists():
         raise RuntimeError(
-            f"{FONT_MANIFEST} missing — run `python3 execution/fetch_fonts.py` once "
+            f"{FONT_MANIFEST} missing — run `python3 execution/ad_creator/fetch_fonts.py` once "
             "to vendor the brand webfonts."
         )
 
@@ -156,7 +156,7 @@ def assert_fonts_loaded(page):
     if failed:
         raise RuntimeError(
             f"Brand webfonts unavailable: {', '.join(failed)}. Ads would render in a "
-            "fallback face — refusing to ship them. Check execution/fonts/."
+            "fallback face — refusing to ship them. Check execution/shared/fonts/."
         )
 
 
@@ -217,7 +217,7 @@ def main():
     parser = argparse.ArgumentParser(description="Render ad rows to full-resolution PNGs.")
     parser.add_argument("--input", required=True, help="JSON file of ad rows.")
     parser.add_argument("--out", required=True, help="Directory to write PNGs into.")
-    parser.add_argument("--brand", default=None, help="Brand config JSON (see execution/brands/).")
+    parser.add_argument("--brand", default=None, help="Brand config JSON (see execution/shared/brands/).")
     parser.add_argument("--seed", type=int, default=None, help="Same seed as the gallery, to match colors.")
     args = parser.parse_args()
 

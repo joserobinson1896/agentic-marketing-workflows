@@ -28,7 +28,7 @@ To find the real file, in order:
 1. Ask the user for the path, or
 2. Search the filesystem — `mdfind` (Spotlight) is the fastest: `mdfind -onlyin "$HOME" "sneaker"`, or `mdfind -onlyin "$HOME" 'kMDItemContentTypeTree == "public.image" && kMDItemFSContentChangeDate >= $time.today'` to catch screenshots taken during the conversation.
 
-Then copy everything into `.tmp/reference_images/` with descriptive names before generating.
+Then copy everything into `execution/image_ad_creator/reference_images/` with descriptive names before generating. Not `.tmp/` — see the note under Automation on why these have to survive a fresh clone.
 
 **macOS screenshot filenames contain a narrow no-break space (U+202F) before "AM"/"PM"**, so a copy-pasted `cp "…at 4.13.59 PM.png"` fails with "No such file or directory". Use a glob instead: `cp ~/Desktop/Screenshot\ 2026-09-02\ at\ 4.13.59*.png dest.png`.
 
@@ -46,10 +46,10 @@ Product fidelity from this pattern is genuinely high — colorway, panel breakup
 
 ## Workflow
 1. Gather inputs; get the product photo onto disk (above).
-2. Write a batch spec JSON (schema in `execution/generate_gemini_ad_batch.py`'s docstring; working example at `execution/ai_runner_gemini_batch.json`). One entry per ad: `id`, `style_ref`, `aspect_ratio`, `scene`, `headline`, `subline`, `cta`, `copy_placement`. Vary the scene *and* the style ref across the batch so the set doesn't look repetitive.
+2. Write a batch spec JSON (schema in `execution/image_ad_creator/generate_gemini_ad_batch.py`'s docstring; working example at `execution/image_ad_creator/ai_runner_gemini_batch.json`). One entry per ad: `id`, `style_ref`, `aspect_ratio`, `scene`, `headline`, `subline`, `cta`, `copy_placement`. Vary the scene *and* the style ref across the batch so the set doesn't look repetitive.
 3. Run:
    ```
-   python execution/generate_gemini_ad_batch.py --spec <spec.json> --out .tmp/gemini_images/<run_name>
+   python execution/image_ad_creator/generate_gemini_ad_batch.py --spec <spec.json> --out .tmp/gemini_images/<run_name>
    ```
    ~10-15s per image, sequential. A 10-ad batch takes ~2 minutes — run it in the background and wait on the `GENERATED=` line.
 4. **QA every image by reading it** (see below). Non-negotiable.
@@ -66,7 +66,7 @@ Learned about failure modes:
 - The model occasionally drops trailing punctuation. Cosmetic — not worth a retry.
 
 ### The hybrid alternative
-If typography must be perfect (long headlines, legal text, exact brand fonts), generate the **imagery only** — no copy in the prompt, clean negative space reserved — and overlay text deterministically with the HTML/CSS + Chromium renderer in `execution/render_ads_to_png.py`. That guarantees typesetting, lets copy be swapped without re-paying for the image, and keeps brand fonts exact. Offer this whenever a batch needs more than a few short words of copy.
+If typography must be perfect (long headlines, legal text, exact brand fonts), generate the **imagery only** — no copy in the prompt, clean negative space reserved — and overlay text deterministically with the HTML/CSS + Chromium renderer in `execution/ad_creator/render_ads_to_png.py`. That guarantees typesetting, lets copy be swapped without re-paying for the image, and keeps brand fonts exact. Offer this whenever a batch needs more than a few short words of copy.
 
 ## Aspect ratio — outputs snap to the nearest supported bucket
 `ImageConfig.aspect_ratio` officially supports `1:1, 2:3, 3:2, 3:4, 4:3, 9:16, 16:9, 21:9`. Anything else **does not error** — it silently returns the nearest supported size:
@@ -84,6 +84,14 @@ So a "4:5" ad is not 1080x1350 and a "9:16" ad is not 1080x1920. For placements 
 - Generate review rounds at `--image-size 1K`; only re-run finals at 2K if the user needs print/high-res.
 - **Always generate a small approval batch (3) before a large one.** A 30-ad batch with a systematic prompt flaw wastes ~$1.20 and the user's time.
 - The `--only` flag exists so one bad ad costs $0.04 to fix, not a whole batch re-run.
+- **The "3 first" rule is enforced in code, not requested in prose.**
+  `generate_gemini_ad_batch.py` runs through `execution/shared/spend_gate.py` with a free pass
+  of **3** rather than the shared default of 10, because 10 images is $0.39 of unasked spend
+  and 3 is exactly the approval batch this section already calls for. Above 3 it prints the
+  estimate and asks; run non-interactively it refuses outright rather than assuming consent.
+  Pass `--yes-spend` once the user has approved the number. The gate is placed after the spec
+  is parsed and filtered, so the estimate reflects the real ad count including `--only`, and
+  before the output directory is created, so a refused run leaves nothing behind.
 
 ## API reference
 Verified against `google-genai` 2.22.0 (installed) and the SDK source, not just docs.
@@ -115,24 +123,25 @@ Notes:
 - A generation can return text but no image (safety refusal). `generate_image()` raises with the `finish_reason` and any text; the batch runner logs it and continues.
 
 ## Automation — unattended daily batch
-`execution/run_daily_image_ads.py` generates **5 ads every morning at 8:00 AM local**, with no LLM in the loop.
+`execution/image_ad_creator/run_daily_image_ads.py` generates **5 ads every morning at 8:00 AM local**, with no LLM in the loop.
 
-- **Scene rotation is stateless**, same principle as `run_daily_ad_batch.py`: today's 5 are a wrapping window into the 20-scene pool at `execution/image_ad_scene_pool.json`, offset by `date.toordinal() * 7`. The stride (7) is coprime with the pool size (20) deliberately — a stride that divides the pool would collapse the rotation into 4 fixed groups. Verified: 20 distinct daily sets, all 20 scenes used across 20 days, first exact repeat on day 21.
+- **Scene rotation is stateless**, same principle as `run_daily_ad_batch.py`: today's 5 are a wrapping window into the 20-scene pool at `execution/image_ad_creator/image_ad_scene_pool.json`, offset by `date.toordinal() * 7`. The stride (7) is coprime with the pool size (20) deliberately — a stride that divides the pool would collapse the rotation into 4 fixed groups. Verified: 20 distinct daily sets, all 20 scenes used across 20 days, first exact repeat on day 21.
 - **`--dry-run` prints today's selection without calling the API.** Use it for any rotation change — it costs nothing. `--date YYYY-MM-DD` simulates a future day.
 - **Delivery:** uploads the PNGs to a dated Drive folder (`AI Runner Image Ads — <date>`) via `google_drive_upload.py`. A failed upload is logged, never fatal — the PNGs stay on disk at `.tmp/gemini_images/auto_<date>/`.
 - **Cost: ~$0.20/day, ~$6/month.** Failures don't retry automatically, by design — an unattended retry loop on a paid API is how a bad prompt turns into a large bill.
+- **The daily runner is deliberately NOT spend-gated.** It imports `generate_image` directly rather than going through the batch script's `main()`, so `execution/shared/spend_gate.py` never sees it. That is correct: setting up a daily batch IS the approval for that batch, and a gate here would refuse every night, since an unattended job is not a terminal. The gate covers ad-hoc and agent-initiated batches, which is where unapproved spend actually happens.
 - Logs: `.tmp/daily_image_ads.log`, plus `.tmp/image_ads_std{out,err}.log` from launchd.
 
 ### The daily output is a candidate set, not ship-ready creative
 Nothing in the unattended path proofreads rendered text, and ~1 in 10 generations misspells a headline. **Someone must review the Drive folder before anything runs as an ad.** This is the one part of the interactive workflow that cannot be automated away — treat the folder as a daily shortlist to pick from.
 
 ### Local (launchd) — currently live
-`~/Library/LaunchAgents/com.marketingcoursedemo.image-ads-daily.plist`, 8:00 AM every day, loaded via `launchctl bootstrap gui/$(id -u) <plist>`. Only fires when the Mac is awake and logged in; launchd runs a missed job once at next wake.
+`~/Library/LaunchAgents/com.example.image-ads-daily.plist`, 8:00 AM every day, loaded via `launchctl bootstrap gui/$(id -u) <plist>`. Only fires when the Mac is awake and logged in; launchd runs a missed job once at next wake.
 
 **launchd gives the script no shell environment**, so `gemini_image_generate._get_client()` loads `.env` by absolute path rather than a cwd-relative `load_dotenv()` search — a bare search silently finds nothing and fails later at auth. Verify any change to that path with `env -i <abs python> <script> --dry-run`, which reproduces launchd's bare environment.
 
 ### Google Drive authorization (done — but the setup has two traps)
-Delivery runs on an OAuth Desktop client (`credentials.json`, project `job-search-claude-506615`) with a single scope, `drive.file`. `execution/authorize_google_drive.py` writes `token.json` (gitignored) holding the refresh token.
+Delivery runs on an OAuth Desktop client (`credentials.json`, from your own Google Cloud project) with a single scope, `drive.file`. `execution/shared/authorize_google_drive.py` writes `token.json` (gitignored) holding the refresh token.
 
 Two traps cost a detour the first time:
 1. **A consent screen in "Testing" status refuses everyone not on its test-user list** — including the project owner — with `Error 403: access_denied`, "has not completed the Google verification process."
@@ -143,7 +152,8 @@ Two traps cost a detour the first time:
 Verified working: a 1.1 MB PNG uploads to a dated folder and returns a shareable link. The `google-auth` version conflict pip warns about (from installing `google-genai`) does **not** break the upload path.
 
 ### Cloud cutover (routine created, disabled pending secrets)
-Routine **`trig_0177oCsmnsD136TT7gLCKwNQ`** — "AI Runner Image Ads Daily", cron `0 12 * * *`, currently `enabled: false`.
+A cloud routine named "AI Runner Image Ads Daily", cron `0 12 * * *`, created disabled. Its
+trigger id is in your own routine list; nothing here needs to hardcode it.
 
 It stays disabled until two environment variables are set on it:
 - `GEMINI_API_KEY` — a fresh clone has no `.env`, so without this every run fails at auth.
@@ -151,12 +161,12 @@ It stays disabled until two environment variables are set on it:
 
 **Set these through the claude.ai routine UI, not from an agent session.** Passing a credential as a tool-call argument writes it into the conversation transcript, and the Claude Code auto-mode classifier blocks commands that print secrets to stdout for exactly that reason. That guardrail is correct — don't route around it.
 
-Why the reference images live in `execution/reference_images/` (~6.2 MB) rather than `.tmp/`: a fresh clone must have them, and `.tmp/` is both gitignored and disposable. A daily job cannot depend on disposable inputs.
+Why the reference images live in `execution/image_ad_creator/reference_images/` (~6.2 MB) rather than `.tmp/`: a fresh clone must have them, and `.tmp/` is both gitignored and disposable. A daily job cannot depend on disposable inputs.
 
 **The cloud routine does something launchd cannot: proofread.** Its prompt has the agent Read each generated PNG and compare the rendered text against `selected_scenes.json`, then name the defective ads in its report. The local job has no LLM in the loop and ships typos silently. That QA step is the main reason to prefer the routine.
 
 **Only one scheduler may be live at a time**, or the same day's slice generates and uploads twice — double spend, duplicate Drive folders. Before enabling the routine, unload the local job:
-`launchctl bootout gui/$(id -u)/com.marketingcoursedemo.image-ads-daily`
+`launchctl bootout gui/$(id -u)/com.example.image-ads-daily`
 
 **DST:** `0 12 * * *` is 8:00 AM only while EDT is in effect. When EST begins it becomes 7:00 AM and must be changed to `0 13 * * *`. Cron is UTC-only and not DST-aware.
 

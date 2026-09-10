@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 """
-One-off: download the brand webfonts into execution/fonts/ so PNG rendering
+One-off: download the brand webfonts into execution/shared/fonts/ so PNG rendering
 never depends on the network.
 
 Run again only if the brand typefaces change:
-    python3 execution/fetch_fonts.py
+    python3 execution/ad_creator/fetch_fonts.py
 
 Why vendor them: the cloud sandbox that renders the daily batch has allowlisted
 egress, so fonts.googleapis.com may be unreachable. A missing webfont doesn't
@@ -18,11 +18,13 @@ into @font-face rules with base64 data URIs.
 
 import json
 import re
+import sys
 import urllib.request
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parent.parent
-FONT_DIR = ROOT / "execution" / "fonts"
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+from _paths import FONTS, ROOT  # noqa: E402  (also puts every execution area on sys.path)
+FONT_DIR = FONTS
 MANIFEST = FONT_DIR / "manifest.json"
 
 # A modern browser UA makes the Google Fonts CSS API return woff2.

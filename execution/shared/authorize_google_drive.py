@@ -3,20 +3,22 @@
 One-time interactive Google OAuth authorization for the daily ad-batch
 uploader. Run this once by hand (it opens a browser for consent):
 
-    python3 execution/authorize_google_drive.py
+    python3 execution/shared/authorize_google_drive.py
 
 It reads credentials.json (OAuth Desktop client, project root) and writes
 token.json (also project root) holding a refresh token — after this,
-execution/run_daily_ad_batch.py can upload to Drive with no further
+execution/ad_creator/run_daily_ad_batch.py can upload to Drive with no further
 interaction, including from an unattended launchd job.
 """
 
+import sys
 from pathlib import Path
 
 from google_auth_oauthlib.flow import InstalledAppFlow
 
 SCOPES = ["https://www.googleapis.com/auth/drive.file"]
-ROOT = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+from _paths import ROOT  # noqa: E402  (also puts every execution area on sys.path)
 CREDENTIALS_PATH = ROOT / "credentials.json"
 TOKEN_PATH = ROOT / "token.json"
 

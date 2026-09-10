@@ -12,7 +12,7 @@ in an ephemeral cloud sandbox that can't carry secret files:
   2. GOOGLE_OAUTH_TOKEN_JSON      — the contents of a token.json, inline.
      Uploads land in the user's own Drive, owned by the user.
   3. token.json in the project root — the local-machine path, produced once by
-     execution/authorize_google_drive.py.
+     execution/shared/authorize_google_drive.py.
 
 Scope is drive.file: this app can only see and manage files it created itself,
 never the rest of the user's Drive.
@@ -21,6 +21,7 @@ never the rest of the user's Drive.
 import json
 import mimetypes
 import os
+import sys
 from pathlib import Path
 
 from google.auth.transport.requests import Request
@@ -30,7 +31,8 @@ from googleapiclient.discovery import build
 from googleapiclient.http import MediaFileUpload
 
 SCOPES = ["https://www.googleapis.com/auth/drive.file"]
-ROOT = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+from _paths import ROOT  # noqa: E402  (also puts every execution area on sys.path)
 TOKEN_PATH = ROOT / "token.json"
 FOLDER_MIME = "application/vnd.google-apps.folder"
 
@@ -58,7 +60,7 @@ def get_credentials():
 
     raise RuntimeError(
         "No Drive credentials found. Set GOOGLE_SERVICE_ACCOUNT_JSON or "
-        "GOOGLE_OAUTH_TOKEN_JSON, or run `python3 execution/authorize_google_drive.py` "
+        "GOOGLE_OAUTH_TOKEN_JSON, or run `python3 execution/shared/authorize_google_drive.py` "
         "once to create token.json."
     )
 

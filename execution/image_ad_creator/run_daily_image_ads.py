@@ -3,7 +3,7 @@
 Unattended daily entry point for Gemini product-image ads — invoked by launchd
 at 8:00 AM local, every day.
 
-  1. Load the scene pool (execution/image_ad_scene_pool.json).
+  1. Load the scene pool (execution/image_ad_creator/image_ad_scene_pool.json).
   2. Pick today's 5 scenes by date arithmetic — stateless on purpose, exactly
      like run_daily_ad_batch.py: no counter file to lose, and a cloud runner
      working from a fresh clone picks the same slice as this machine would.
@@ -22,8 +22,11 @@ import json
 import sys
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parent.parent
-sys.path.insert(0, str(ROOT / "execution"))
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+from _paths import ROOT  # noqa: E402  (also puts every execution area on sys.path)
+
+# Data that belongs to this area lives beside it.
+HERE = Path(__file__).resolve().parent
 
 from gemini_image_generate import generate_image  # noqa: E402
 from generate_gemini_ad_batch import build_prompt  # noqa: E402
@@ -33,7 +36,7 @@ from generate_gemini_ad_batch import build_prompt  # noqa: E402
 # reason to have installed. A module-level import would crash the whole run
 # before a single ad got generated — the same lesson as run_daily_ad_batch.py.
 
-POOL_PATH = ROOT / "execution" / "image_ad_scene_pool.json"
+POOL_PATH = HERE / "image_ad_scene_pool.json"
 OUT_ROOT = ROOT / ".tmp" / "gemini_images"
 LOG_PATH = ROOT / ".tmp" / "daily_image_ads.log"
 

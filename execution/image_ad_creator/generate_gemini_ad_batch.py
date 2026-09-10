@@ -17,12 +17,12 @@ Spec schema (see .tmp/ad_batches/*.json):
     }
 
 Usage:
-    python execution/generate_gemini_ad_batch.py \
+    python execution/image_ad_creator/generate_gemini_ad_batch.py \
         --spec .tmp/ad_batches/ai_runner_gemini_batch.json \
         --out .tmp/gemini_images/ai_runner_batch
 
     # regenerate just a few ids (e.g. after a text-rendering typo):
-    python execution/generate_gemini_ad_batch.py --spec ... --out ... --only 02_wet_street_night 07_flatlay_kit
+    python execution/image_ad_creator/generate_gemini_ad_batch.py --spec ... --out ... --only 02_wet_street_night 07_flatlay_kit
 """
 
 import argparse
@@ -30,8 +30,10 @@ import json
 import os
 import sys
 import time
+from pathlib import Path
 
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+import _paths  # noqa: F401,E402  (puts every execution area on sys.path)
 from gemini_image_generate import DEFAULT_MODEL, generate_image  # noqa: E402
 
 

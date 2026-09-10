@@ -16,11 +16,11 @@ Generates Unified Dashboards paid-social ad creatives by combining 3 fixed templ
    - For Template B rows specifically: a fictional company name + a believable stat per niche (never leave these generic).
    - Any specific offers/angles they want represented.
 
-3. **Build the input JSON.** Turn the gathered niches/offers into row objects matching the schema documented in `execution/generate_ad_creatives.py`'s docstring (also see `execution/sample_variables.json` for a working example — it already encodes the 6 shortlisted reference ads). Write it to `.tmp/ad_batches/<run_name>.json`.
+3. **Build the input JSON.** Turn the gathered niches/offers into row objects matching the schema documented in `execution/ad_creator/generate_ad_creatives.py`'s docstring (also see `execution/ad_creator/sample_variables.json` for a working example — it already encodes the 6 shortlisted reference ads). Write it to `.tmp/ad_batches/<run_name>.json`.
 
 4. **Run the script:**
    ```
-   python execution/generate_ad_creatives.py --input .tmp/ad_batches/<run_name>.json --out .tmp/generated_ads/<run_name>
+   python execution/ad_creator/generate_ad_creatives.py --input .tmp/ad_batches/<run_name>.json --out .tmp/generated_ads/<run_name>
    ```
    This writes `.tmp/generated_ads/<run_name>/gallery.html` — a self-contained HTML document (full `<html>/<head>/<body>`) with all the ad cards plus the shortlist-checkmark review UI.
 
@@ -32,5 +32,5 @@ Generates Unified Dashboards paid-social ad creatives by combining 3 fixed templ
 
 ## Reference files
 - `directives/ad_creator.md` — brand system + SOP (source of truth)
-- `execution/generate_ad_creatives.py` — the generator (extend this rather than writing a new script)
-- `execution/sample_variables.json` — working example input, encodes the 6 shortlisted reference ads
+- `execution/ad_creator/generate_ad_creatives.py` — the generator (extend this rather than writing a new script)
+- `execution/ad_creator/sample_variables.json` — working example input, encodes the 6 shortlisted reference ads

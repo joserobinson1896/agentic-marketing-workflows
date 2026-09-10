@@ -9,7 +9,7 @@
   },
   "brands": {
     "unified_dashboards": {
-      "brand_config": "execution/brands/unified_dashboards.json",
+      "brand_config": "execution/shared/brands/unified_dashboards.json",
       "groups": [
         [
           {"template": "A", "niche": "SaaS founders",
@@ -36,7 +36,7 @@
       ]
     },
     "leadforge": {
-      "brand_config": "execution/brands/leadforge.json",
+      "brand_config": "execution/shared/brands/leadforge.json",
       "groups": [
         [
           {"template": "A", "niche": "B2B SaaS sales teams",
