@@ -54,4 +54,4 @@ The daily folder is a **candidate set** — nobody has proofread the rendered te
 - `execution/image_ad_creator/run_daily_image_ads.py` — unattended 8 AM daily batch (`--dry-run`, `--date`)
 - `execution/image_ad_creator/image_ad_scene_pool.json` — 20-scene rotation pool
 - `execution/image_ad_creator/ai_runner_gemini_batch.json` — working 10-ad example spec
-- `execution/image_ad_creator/reference_images/` — product photo + style references (durable, not `.tmp/`)
+- `execution/image_ad_creator/reference_images/` — **operator-supplied**, not in the repo. Its README names the four expected filenames. Durable, not `.tmp/`, because the daily job depends on them

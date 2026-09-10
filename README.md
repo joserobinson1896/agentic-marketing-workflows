@@ -83,6 +83,11 @@ python execution/cold_email/build_cold_emails.py --dry-run
 python execution/image_ad_creator/run_daily_image_ads.py --dry-run
 ```
 
+The image ad build needs one setup step before it can generate anything: it takes a product
+photo and three style references that are not in the repo. See
+`execution/image_ad_creator/reference_images/README.md` for the filenames it expects. The
+`--dry-run` above works without them.
+
 ## Tests
 
 Five suites, 292 checks, no API keys or network required.
@@ -136,6 +141,11 @@ contract.
 
 Everything else runs against real APIs: enrichment, Gemini generation, Instantly campaign
 creation, Google Drive delivery.
+
+One further thing is absent rather than stubbed: the image ad build's product photo and style
+references. Those are inputs to a commercial creative pipeline, so you supply your own rather
+than inherit images whose licensing this repo cannot vouch for. Both entry points name any
+missing file and exit before spending anything.
 
 ## Safety notes
 

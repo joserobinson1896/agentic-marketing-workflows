@@ -33,7 +33,7 @@ import time
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-import _paths  # noqa: F401,E402  (puts every execution area on sys.path)
+from _paths import ROOT  # noqa: E402  (also puts every execution area on sys.path)
 from gemini_image_generate import DEFAULT_MODEL, generate_image  # noqa: E402
 from spend_gate import add_spend_argument, confirm_spend  # noqa: E402  (lives in shared/)
 
@@ -85,6 +85,24 @@ def main():
         missing = set(args.only) - {a["id"] for a in ads}
         if missing:
             print(f"WARNING: ids not found in spec: {', '.join(sorted(missing))}")
+
+    # Check the reference images BEFORE the gate. They are not in the repo — the user
+    # supplies them (see reference_images/README.md) — and generate_image only opens them
+    # after the API client is built, so a missing file would otherwise surface as a
+    # per-ad failure AFTER the operator had already approved the spend for the batch.
+    missing = sorted({
+        str(ROOT / path)
+        for ad in ads
+        for path in (spec["product_image"], ad["style_ref"])
+        if not (ROOT / path).exists()
+    })
+    if missing:
+        print("ERROR: reference image(s) not found:", flush=True)
+        for path in missing:
+            print(f"  {path}", flush=True)
+        print("  These are supplied by you, not shipped in the repo. See "
+              "execution/image_ad_creator/reference_images/README.md", flush=True)
+        return 1
 
     # The gate sits after the spec is parsed and filtered, so `len(ads)` is the real number
     # of images this run would pay for, and before the output directory exists, so a refused

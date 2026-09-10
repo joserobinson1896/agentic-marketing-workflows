@@ -161,7 +161,11 @@ It stays disabled until two environment variables are set on it:
 
 **Set these through the claude.ai routine UI, not from an agent session.** Passing a credential as a tool-call argument writes it into the conversation transcript, and the Claude Code auto-mode classifier blocks commands that print secrets to stdout for exactly that reason. That guardrail is correct — don't route around it.
 
-Why the reference images live in `execution/image_ad_creator/reference_images/` (~6.2 MB) rather than `.tmp/`: a fresh clone must have them, and `.tmp/` is both gitignored and disposable. A daily job cannot depend on disposable inputs.
+**The reference images are not in the repo — the operator supplies them.** They are inputs to a commercial creative pipeline and their provenance cannot be asserted on the reader's behalf, so `execution/image_ad_creator/reference_images/README.md` names the four expected filenames and what each one is for instead. The batch specs point at those exact names, so dropping the files in is the whole setup step.
+
+They still belong in `execution/image_ad_creator/reference_images/` rather than `.tmp/`, for the reason that folder exists: the daily job depends on them and `.tmp/` is gitignored and disposable. A daily job cannot depend on disposable inputs.
+
+Both entry points check the files exist **before** doing anything expensive. `generate_gemini_ad_batch.py` names every missing file and exits non-zero ahead of the spend gate, so the operator is never asked to approve a batch that cannot run; the daily runner does the same and exits non-zero rather than logging five identical file errors every morning until someone reads the log. `--dry-run` never opens them, so rotation changes stay verifiable with nothing in the folder.
 
 **The cloud routine does something launchd cannot: proofread.** Its prompt has the agent Read each generated PNG and compare the rendered text against `selected_scenes.json`, then name the defective ads in its report. The local job has no LLM in the loop and ships typos silently. That QA step is the main reason to prefer the routine.
 

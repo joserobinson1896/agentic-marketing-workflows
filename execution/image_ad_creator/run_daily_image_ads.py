@@ -92,7 +92,24 @@ def main():
         for s in scenes:
             print(f"  {s['id']:<24} {s['aspect_ratio']:<5} \"{s['headline']}\"")
         print("DRY_RUN=1  (no images generated, no cost incurred)")
-        return
+        return 0
+
+    # The reference images are supplied by the operator, not shipped in the repo, so an
+    # unattended job has to say plainly that they are missing rather than logging five
+    # identical FileNotFoundErrors at 8 AM every morning until someone reads the log.
+    missing = sorted({
+        str(ROOT / path)
+        for ad in scenes
+        for path in (pool["product_image"], ad["style_ref"])
+        if not (ROOT / path).exists()
+    })
+    if missing:
+        log("ERROR: reference image(s) not found, so nothing was generated:")
+        for path in missing:
+            log(f"  {path}")
+        log("  See execution/image_ad_creator/reference_images/README.md")
+        print("GENERATED=0")
+        return 1
 
     date_str = today.isoformat()
     out_dir = OUT_ROOT / f"auto_{date_str}"
@@ -124,15 +141,20 @@ def main():
     print(f"GENERATED={len(generated)}/{len(scenes)}")
 
     if not generated:
+        # Non-zero: a morning that produced nothing is a failure, and it has to be visible
+        # as one. Same principle as the two email pipelines refusing to write an empty batch.
         log("No images generated — stopping before upload.")
-        return
+        return 1
 
     # NOTE: nothing here proofreads the rendered headline text. Roughly 1 in 10
     # generations comes back misspelled (see directives/image_ad_creator.md),
     # and only a human or an LLM can catch that — so treat this folder as a
     # daily *candidate* set to review, not as ship-ready creative.
     deliver(generated, f"AI Runner Image Ads — {date_str}")
+    return 0
 
 
 if __name__ == "__main__":
-    main()
+    # sys.exit, not a bare main(): the missing-reference path returns 1, and an unattended
+    # job's failure has to show up in the exit code rather than only in the log.
+    sys.exit(main())
