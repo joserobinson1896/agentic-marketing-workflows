@@ -1,0 +1,108 @@
+{
+  "_comment": "Hand-authored mock ad references. These are NOT produced by generate_ad_creatives.py — no creative generation runs in this pipeline. They exist so mock visitors arrive with realistic UTMs and so an identified lead can be traced back to the angle that brought them in, which the outreach email then references. Angles mirror the three ad_creator templates: A = concrete metrics landing on 'one place', B = fictional company + believable stat, C = provocative one-liner.",
+
+  "ads": [
+    {
+      "ad_id": "ud-a-014",
+      "template": "A",
+      "angle": "Four tools, four dashboards, four versions of the truth",
+      "headline": "Pipeline in HubSpot. Revenue in Stripe. Sends in Mailchimp. One screen.",
+      "channel": "linkedin",
+      "utm": {
+        "utm_source": "linkedin",
+        "utm_medium": "paid_social",
+        "utm_campaign": "ud_q3_unify",
+        "utm_content": "ud-a-014"
+      },
+      "referrer": "https://www.linkedin.com/"
+    },
+    {
+      "ad_id": "ud-a-021",
+      "template": "A",
+      "angle": "The Monday morning reporting scramble",
+      "headline": "Stop rebuilding the same board report every Monday.",
+      "channel": "linkedin",
+      "utm": {
+        "utm_source": "linkedin",
+        "utm_medium": "paid_social",
+        "utm_campaign": "ud_q3_unify",
+        "utm_content": "ud-a-021"
+      },
+      "referrer": "https://www.linkedin.com/"
+    },
+    {
+      "ad_id": "ud-b-007",
+      "template": "B",
+      "angle": "Named-company proof point on hours saved",
+      "headline": "Meridian Bright cut reporting from 11 hours a week to 20 minutes.",
+      "channel": "meta",
+      "utm": {
+        "utm_source": "facebook",
+        "utm_medium": "paid_social",
+        "utm_campaign": "ud_q3_proof",
+        "utm_content": "ud-b-007"
+      },
+      "referrer": "https://l.facebook.com/"
+    },
+    {
+      "ad_id": "ud-b-012",
+      "template": "B",
+      "angle": "Named-company proof point on attribution gaps",
+      "headline": "Halcyon Retail found 34% of paid revenue their reports never credited.",
+      "channel": "meta",
+      "utm": {
+        "utm_source": "facebook",
+        "utm_medium": "paid_social",
+        "utm_campaign": "ud_q3_proof",
+        "utm_content": "ud-b-012"
+      },
+      "referrer": "https://l.facebook.com/"
+    },
+    {
+      "ad_id": "ud-c-003",
+      "template": "C",
+      "angle": "Provocation — the spreadsheet is the real dashboard",
+      "headline": "Your real dashboard is a spreadsheet someone updates by hand.",
+      "channel": "linkedin",
+      "utm": {
+        "utm_source": "linkedin",
+        "utm_medium": "paid_social",
+        "utm_campaign": "ud_q3_provoke",
+        "utm_content": "ud-c-003"
+      },
+      "referrer": "https://www.linkedin.com/"
+    },
+    {
+      "ad_id": "ud-c-009",
+      "template": "C",
+      "angle": "Provocation — nobody trusts the numbers",
+      "headline": "Nobody in the meeting believes the number on the slide.",
+      "channel": "reddit",
+      "utm": {
+        "utm_source": "reddit",
+        "utm_medium": "paid_social",
+        "utm_campaign": "ud_q3_provoke",
+        "utm_content": "ud-c-009"
+      },
+      "referrer": "https://www.reddit.com/"
+    },
+    {
+      "ad_id": "organic-search",
+      "template": null,
+      "angle": "Organic search — no campaign attribution",
+      "headline": null,
+      "channel": "organic",
+      "utm": {},
+      "referrer": "https://www.google.com/"
+    },
+    {
+      "ad_id": "direct",
+      "template": null,
+      "angle": "Direct / no referrer",
+      "headline": null,
+      "channel": "direct",
+      "utm": {},
+      "referrer": null
+    }
+  ]
+}

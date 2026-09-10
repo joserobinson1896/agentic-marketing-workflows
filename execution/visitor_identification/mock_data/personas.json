@@ -1,0 +1,138 @@
+{
+  "_comment": "Mock identity pool standing in for RB2B's person-level graph. Every person, company, domain and email address here is fictional — nothing is ever sent, the pipeline only writes .eml files to disk. All 10 US personas carry a mock business_email so every lead is addressable. Real RB2B guarantees only `LinkedIn URL` and `First Name`; that nullability is covered by the receiver tests (test_rb2b_receiver.py) rather than by holes in this pool. A couple of personas still carry a null title / estimated_revenue so enrichment and generation must tolerate a thin record. The two non-US personas exercise the resolver's US-only filter — used only with `mock_visitors.py --include-international`, and they should never produce an identified lead.",
+
+  "personas": [
+    {
+      "id": "p01",
+      "first_name": "Dana", "last_name": "Whitfield",
+      "title": "VP Marketing",
+      "linkedin_url": "https://www.linkedin.com/in/dana-whitfield-northwind/",
+      "business_email": "dana.whitfield@northwindfreight.com",
+      "company_name": "Northwind Freight", "website": "https://northwindfreight.com",
+      "industry": "Logistics & Supply Chain",
+      "employee_count": 240, "estimated_revenue": "$25M-$50M",
+      "city": "Chicago", "state": "IL", "zipcode": "60607", "country": "US"
+    },
+    {
+      "id": "p02",
+      "first_name": "Marcus", "last_name": "Ortega",
+      "title": "Head of Growth",
+      "linkedin_url": "https://www.linkedin.com/in/marcus-ortega-cadence/",
+      "business_email": "marcus@cadencehealth.io",
+      "company_name": "Cadence Health", "website": "https://cadencehealth.io",
+      "industry": "Healthcare Technology",
+      "employee_count": 85, "estimated_revenue": "$10M-$25M",
+      "city": "Austin", "state": "TX", "zipcode": "78704", "country": "US"
+    },
+    {
+      "id": "p03",
+      "first_name": "Priya", "last_name": "Raman",
+      "title": "Director of Revenue Operations",
+      "linkedin_url": "https://www.linkedin.com/in/priya-raman-revops/",
+      "business_email": "p.raman@ledgerline.com",
+      "company_name": "Ledgerline", "website": "https://ledgerline.com",
+      "industry": "Financial Services",
+      "employee_count": 410, "estimated_revenue": "$50M-$100M",
+      "city": "Boston", "state": "MA", "zipcode": "02116", "country": "US"
+    },
+    {
+      "id": "p04",
+      "first_name": "Tobias", "last_name": "Kerr",
+      "title": "Chief Marketing Officer",
+      "linkedin_url": "https://www.linkedin.com/in/tobias-kerr-sunbelt/",
+      "business_email": "tobias.kerr@sunbeltoutfitters.com",
+      "company_name": "Sunbelt Outfitters", "website": "https://sunbeltoutfitters.com",
+      "industry": "Retail & Ecommerce",
+      "employee_count": 150, "estimated_revenue": "$25M-$50M",
+      "city": "Denver", "state": "CO", "zipcode": "80202", "country": "US"
+    },
+    {
+      "id": "p05",
+      "first_name": "Alina", "last_name": "Moreau",
+      "title": "Demand Generation Lead",
+      "linkedin_url": "https://www.linkedin.com/in/alina-moreau-demandgen/",
+      "business_email": "alina.moreau@vaultpoint.co",
+      "company_name": "Vaultpoint", "website": "https://vaultpoint.co",
+      "industry": "Cybersecurity",
+      "employee_count": 62, "estimated_revenue": "$5M-$10M",
+      "city": "Seattle", "state": "WA", "zipcode": "98104", "country": "US"
+    },
+    {
+      "id": "p06",
+      "first_name": "Ray", "last_name": "Calloway",
+      "title": "Chief Operating Officer",
+      "linkedin_url": "https://www.linkedin.com/in/ray-calloway-harborlight/",
+      "business_email": "rcalloway@harborlightlogistics.com",
+      "company_name": "Harborlight Logistics", "website": "https://harborlightlogistics.com",
+      "industry": "Logistics & Supply Chain",
+      "employee_count": 780, "estimated_revenue": "$100M-$250M",
+      "city": "Charleston", "state": "SC", "zipcode": "29401", "country": "US"
+    },
+    {
+      "id": "p07",
+      "first_name": "Simone", "last_name": "Achebe",
+      "title": null,
+      "linkedin_url": "https://www.linkedin.com/in/simone-achebe-brightseed/",
+      "business_email": "simone@brightseedlabs.com",
+      "company_name": "Brightseed Labs", "website": "https://brightseedlabs.com",
+      "industry": "Biotechnology",
+      "employee_count": 120, "estimated_revenue": "$10M-$25M",
+      "city": "Raleigh", "state": "NC", "zipcode": "27601", "country": "US"
+    },
+    {
+      "id": "p08",
+      "first_name": "Nate", "last_name": "Kowalski",
+      "title": "Director of Marketing",
+      "linkedin_url": "https://www.linkedin.com/in/nate-kowalski-alloyoak/",
+      "business_email": "nate.k@alloyandoak.com",
+      "company_name": "Alloy & Oak", "website": "https://alloyandoak.com",
+      "industry": "Consumer Goods",
+      "employee_count": 95, "estimated_revenue": "$10M-$25M",
+      "city": "Minneapolis", "state": "MN", "zipcode": "55401", "country": "US"
+    },
+    {
+      "id": "p09",
+      "first_name": "Camille", "last_name": "Ferrar",
+      "title": "Head of Analytics",
+      "linkedin_url": "https://www.linkedin.com/in/camille-ferrar-tidewater/",
+      "business_email": "camille.ferrar@tidewatergroup.com",
+      "company_name": "Tidewater Group", "website": "https://tidewatergroup.com",
+      "industry": "Professional Services",
+      "employee_count": 320, "estimated_revenue": null,
+      "city": "Tampa", "state": "FL", "zipcode": "33602", "country": "US"
+    },
+    {
+      "id": "p10",
+      "first_name": "Devon", "last_name": "Pryce",
+      "title": "Founder",
+      "linkedin_url": "https://www.linkedin.com/in/devon-pryce-kestrel/",
+      "business_email": "devon@kestrelsupply.co",
+      "company_name": "Kestrel Supply Co", "website": "https://kestrelsupply.co",
+      "industry": "Wholesale & Distribution",
+      "employee_count": 48, "estimated_revenue": "$5M-$10M",
+      "city": "Portland", "state": "OR", "zipcode": "97209", "country": "US"
+    },
+    {
+      "id": "p11-intl",
+      "first_name": "Ines", "last_name": "Delacroix",
+      "title": "Growth Director",
+      "linkedin_url": "https://www.linkedin.com/in/ines-delacroix-lumen/",
+      "business_email": "ines@lumenpath.eu",
+      "company_name": "Lumenpath", "website": "https://lumenpath.eu",
+      "industry": "Software",
+      "employee_count": 140, "estimated_revenue": "$10M-$25M",
+      "city": "Lyon", "state": "ARA", "zipcode": "69002", "country": "FR"
+    },
+    {
+      "id": "p12-intl",
+      "first_name": "Aidan", "last_name": "Fairhurst",
+      "title": "VP Marketing",
+      "linkedin_url": "https://www.linkedin.com/in/aidan-fairhurst-marlow/",
+      "business_email": "aidan@marlowanalytics.co.uk",
+      "company_name": "Marlow Analytics", "website": "https://marlowanalytics.co.uk",
+      "industry": "Market Research",
+      "employee_count": 210, "estimated_revenue": "$25M-$50M",
+      "city": "Manchester", "state": "ENG", "zipcode": "M1 2WD", "country": "GB"
+    }
+  ]
+}

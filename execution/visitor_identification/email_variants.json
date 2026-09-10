@@ -1,0 +1,108 @@
+{
+  "_comment": "Structural variants of the warm-visitor email. All of them follow execution/shared/sales_frameworks/15_warm_visitor_hybrid.md \u2014 warm open, personalized pain hook, one-line solution, sample-dashboard CTA, soft open door. What differs is the MOVE each one makes on the pain, which is the line the email lives or dies on. Generate the matrix with execution/visitor_identification/generate_email_variants.py, pick the ones that work, then set `active_variants` in rb2b_config.json.",
+  "_comment_editing": "These are prompt instructions, not templates \u2014 no slot-filling. Edit the `pain_move` text to change how a variant argues. Add a new variant by adding an object here; nothing in the code needs to change.",
+  "variants": [
+    {
+      "id": "stack_math",
+      "name": "Stack math",
+      "when_to_use": "Default. Works on any lead with 3+ detected sources.",
+      "pain_move": "Make the pain arithmetic. Name their actual tools and turn the count into the problem: N tools means N different answers to one simple question ('how did last month actually go?'). The number of systems IS the pain \u2014 don't editorialize past it.",
+      "approved_examples": [
+        {
+          "written_for": "Priya at Ledgerline",
+          "subject": "ledgerline reporting: 6 tools",
+          "body": "Thanks for stopping by the site, Priya.\n\nWith Salesforce, Marketo, and Google Analytics 4, you've got three different answers to 'how did last month's revenue look?' We connect those into one unified picture.\n\nWould you like to see a sample dashboard built on Ledgerline's stack? Or tell me what brought you to our site.\n\nJose"
+        },
+        {
+          "written_for": "Devon at Kestrel Supply Co",
+          "subject": "your unified view for Kestrel Supply",
+          "body": "Hey Devon, thanks for visiting Unified Dashboards.\n\nYou're running HubSpot, Stripe, and Mailchimp. That's three different systems that make answering a simple question like 'how did last month actually go?' a manual puzzle.\n\nI can show you what a unified view looks like. Want me to send over a sample dashboard built on your actual stack?\n\nOr just tell me what questions led you to the site.\n\nJose"
+        }
+      ]
+    },
+    {
+      "id": "monday_scramble",
+      "name": "The Monday scramble",
+      "when_to_use": "Leads with no BI tool, where reporting is almost certainly manual.",
+      "pain_move": "Make the pain a recurring ritual with a time cost. Somebody on their team is exporting from their named tools and stitching it together by hand, on a schedule, forever. Anchor on hours per week or per month. The waste is that it happens again next week.",
+      "approved_examples": [
+        {
+          "written_for": "Devon at Kestrel Supply Co",
+          "subject": "kestrel supply reports",
+          "body": "Hey Devon, glad you visited Unified Dashboards.\n\nRunning HubSpot, Stripe, and Mailchimp means someone on your team is likely spending hours each Monday pulling data and building reports by hand. There's a simpler way to get all that reporting time back.\n\nCan I send over a sample dashboard built on your actual stack? Or tell me what question sent you looking for unified reporting.\n\nJose"
+        }
+      ]
+    },
+    {
+      "id": "blind_spot",
+      "name": "Blind spot",
+      "when_to_use": "Leads that already own a BI tool \u2014 Looker, Tableau, Power BI.",
+      "pain_move": "Make the pain something their current setup structurally cannot see. They already have the dashboard; name the specific sources feeding it and the one that isn't, and what that costs them. Never imply they lack a dashboard \u2014 the gap is what it's connected to.",
+      "approved_examples": [
+        {
+          "written_for": "Nate at Alloy & Oak",
+          "subject": "for alloy & oak",
+          "body": "Thanks for stopping by the site, Nate.\n\nWith Shopify, Klaviyo, and Meta Ads running, the blind spots in your customer journey and attribution can hide revenue opportunities.\n\nThere's a clearer way to connect all those dots.\n\nCan I send over a sample dashboard built on your stack, just for Alloy & Oak?\n\nOr tell me what question you hoped to answer on the site.\n\nJose"
+        },
+        {
+          "written_for": "Devon at Kestrel Supply Co",
+          "subject": "Kestrel Supply Co's reporting blind spot",
+          "body": "Hey Devon, thanks for checking out Unified Dashboards today.\n\nWith HubSpot, Stripe, and Mailchimp, understanding your true customer acquisition costs across channels is likely a manual, time-consuming effort.\n\nWe connect those disparate sources, giving you one unified view of your entire funnel.\n\nWant me to send over a sample dashboard built on your stack?\n\nOr let me know what you were hoping to solve with your visit.\n\nJose"
+        }
+      ]
+    },
+    {
+      "id": "new_way",
+      "name": "There's a new way",
+      "when_to_use": "Closest to the Audience-Building DM's original register.",
+      "pain_move": "Use the playbook's own construction: a specific observation about their stack, then 'there's a new way for [their kind of company] to [specific benefit]' \u2014 and let the mechanism stay unexplained. The pull is curiosity about the mechanism, not a description of it.",
+      "approved_examples": [
+        {
+          "written_for": "Priya at Ledgerline",
+          "subject": "Ledgerline's data tools",
+          "body": "Hi Priya,\n\nThanks for stopping by the Unified Dashboards site.\n\nWith Salesforce, Marketo, and Google Analytics 4 feeding into Looker, you're likely losing precious time aligning data points instead of driving revenue. There's a new way for financial services companies like Ledgerline to centralize all revenue data without manual reconciliation.\n\nWant me to send over a sample dashboard built on your actual stack? Or tell me what brought you to the site.\n\nJose"
+        }
+      ]
+    },
+    {
+      "id": "question_first",
+      "name": "Question first",
+      "when_to_use": "Higher reply rates when you want a conversation rather than a download.",
+      "pain_move": "Open the body with a genuine, specific question about their stack that only has one uncomfortable answer \u2014 e.g. which system they trust when two of their named tools disagree on the same number. The question does the work; do not answer it for them.",
+      "approved_examples": [
+        {
+          "written_for": "Priya at Ledgerline",
+          "subject": "quick question for ledgerline",
+          "body": "Thanks for stopping by, Priya.\n\nWhen Salesforce, Marketo, and Google Analytics 4 disagree on a number, which one does Ledgerline trust?\n\nWe can unify these sources for a single, reliable view. Want me to send over a sample dashboard built on your actual stack?\n\nOr just let me know what you were looking for.\n\nJose"
+        }
+      ]
+    },
+    {
+      "id": "proof_point",
+      "name": "Proof point",
+      "when_to_use": "Skeptical or senior buyers who want evidence before a claim.",
+      "pain_move": "Lead with the concrete result from a comparable build \u2014 reporting going from ~11 hours a week to ~20 minutes \u2014 and immediately tie it to their named stack so it isn't a generic case study. The proof comes first, the pain is implied by it."
+    },
+    {
+      "id": "ultra_short",
+      "name": "Ultra short",
+      "when_to_use": "Founders and C-level, who reply to the shortest thing in the inbox.",
+      "pain_move": "Three or four lines total, under 50 words. Warm open, one line naming their tools and the consequence, the CTA. No solution paragraph at all \u2014 the offer of the sample dashboard IS the solution. Ruthless: every word must survive a cut test.",
+      "approved_examples": [
+        {
+          "written_for": "Nate at Alloy & Oak",
+          "subject": "Alloy & Oak's reporting",
+          "body": "Thanks for stopping by the site, Nate.\n\nWith Shopify, Klaviyo, and Meta Ads, you're probably spending hours manually reconciling your key metrics.\n\nWant me to send over a sample dashboard built on your actual stack?\n\nOr just let me know what pulled you in.\n\nJose"
+        }
+      ]
+    },
+    {
+      "id": "peer_frame",
+      "name": "Peer frame",
+      "when_to_use": "Mid-size companies where 'others like you' carries weight.",
+      "pain_move": "Frame the pain as a pattern across companies like theirs \u2014 same industry, similar headcount, running a similar stack \u2014 and then land that they're in it. Social proof as diagnosis rather than as a testimonial. Be specific about the peer group, not 'many companies'."
+    }
+  ],
+  "_comment_approved": "`approved_examples` are real drafts the client picked out of a variant matrix. They are injected into the prompt as few-shot exemplars so new copy is a derivative of an approved voice rather than a fresh interpretation of the framework. They were written for OTHER prospects \u2014 the prompt is explicit that the companies, tools and specifics in them must never be reused, and the grounding check catches it if the model tries.",
+  "_comment_inactive": "peer_frame and proof_point were generated but not selected. Kept, not deleted \u2014 a variant that loses one review may win the next. `active_variants` in rb2b_config.json controls which ones actually run."
+}

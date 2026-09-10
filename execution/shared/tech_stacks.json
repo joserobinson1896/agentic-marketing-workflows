@@ -1,0 +1,104 @@
+{
+  "_comment": "Mock output of a tech-stack detector (BuiltWith / Wappalyzer / Clearbit-shaped), keyed by company domain — which is how real detectors are queried. `confidence` and `source` mirror how those services report a detection, so swapping in a real provider means mapping its response into this same shape, not changing anything downstream.",
+
+  "_comment_data_source_categories": "Categories that represent a reporting data source Unified Dashboards would unify. enrich_visitors.py intersects each company's stack with this list to derive `siloed_sources` — the count and names that give the outreach email its hook. Categories NOT listed here (Support, ERP, Accounting) are real detections but not part of the pitch.",
+  "data_source_categories": [
+    "CRM", "Payments", "Email Marketing", "Web Analytics", "Advertising",
+    "CDP", "Product Analytics", "Ecommerce", "Data Warehouse", "BI",
+    "Subscription Billing", "Sales Engagement"
+  ],
+
+  "_comment_bi_tools": "If a company already runs one of these, they have a BI seat and the pitch shifts from 'you have no dashboard' to 'your BI tool isn't connected to everything'. enrich_visitors.py uses this to pick a segment.",
+  "bi_tools": ["Looker", "Tableau", "Power BI", "Mode", "Metabase"],
+
+  "stacks": {
+    "northwindfreight.com": [
+      {"tool": "HubSpot", "category": "CRM", "confidence": 0.96, "source": "script tag"},
+      {"tool": "Stripe", "category": "Payments", "confidence": 0.93, "source": "script tag"},
+      {"tool": "Mailchimp", "category": "Email Marketing", "confidence": 0.89, "source": "dns record"},
+      {"tool": "Google Analytics 4", "category": "Web Analytics", "confidence": 0.99, "source": "script tag"},
+      {"tool": "Google Ads", "category": "Advertising", "confidence": 0.87, "source": "cookie"},
+      {"tool": "Zendesk", "category": "Support", "confidence": 0.82, "source": "subdomain"}
+    ],
+    "cadencehealth.io": [
+      {"tool": "HubSpot", "category": "CRM", "confidence": 0.94, "source": "script tag"},
+      {"tool": "Stripe", "category": "Payments", "confidence": 0.97, "source": "script tag"},
+      {"tool": "Customer.io", "category": "Email Marketing", "confidence": 0.85, "source": "dns record"},
+      {"tool": "Segment", "category": "CDP", "confidence": 0.91, "source": "script tag"},
+      {"tool": "Mixpanel", "category": "Product Analytics", "confidence": 0.88, "source": "script tag"},
+      {"tool": "Google Analytics 4", "category": "Web Analytics", "confidence": 0.99, "source": "script tag"}
+    ],
+    "ledgerline.com": [
+      {"tool": "Salesforce", "category": "CRM", "confidence": 0.98, "source": "dns record"},
+      {"tool": "Marketo", "category": "Email Marketing", "confidence": 0.92, "source": "script tag"},
+      {"tool": "Snowflake", "category": "Data Warehouse", "confidence": 0.79, "source": "job posting"},
+      {"tool": "Looker", "category": "BI", "confidence": 0.76, "source": "job posting"},
+      {"tool": "Outreach", "category": "Sales Engagement", "confidence": 0.83, "source": "dns record"},
+      {"tool": "Google Analytics 4", "category": "Web Analytics", "confidence": 0.99, "source": "script tag"}
+    ],
+    "sunbeltoutfitters.com": [
+      {"tool": "Shopify", "category": "Ecommerce", "confidence": 0.99, "source": "http header"},
+      {"tool": "Klaviyo", "category": "Email Marketing", "confidence": 0.95, "source": "script tag"},
+      {"tool": "Meta Ads", "category": "Advertising", "confidence": 0.91, "source": "script tag"},
+      {"tool": "Google Ads", "category": "Advertising", "confidence": 0.88, "source": "cookie"},
+      {"tool": "Google Analytics 4", "category": "Web Analytics", "confidence": 0.99, "source": "script tag"},
+      {"tool": "Gorgias", "category": "Support", "confidence": 0.80, "source": "script tag"}
+    ],
+    "vaultpoint.co": [
+      {"tool": "HubSpot", "category": "CRM", "confidence": 0.95, "source": "script tag"},
+      {"tool": "Stripe", "category": "Payments", "confidence": 0.90, "source": "script tag"},
+      {"tool": "Mailchimp", "category": "Email Marketing", "confidence": 0.86, "source": "dns record"},
+      {"tool": "LinkedIn Ads", "category": "Advertising", "confidence": 0.84, "source": "script tag"},
+      {"tool": "Google Analytics 4", "category": "Web Analytics", "confidence": 0.99, "source": "script tag"},
+      {"tool": "Intercom", "category": "Support", "confidence": 0.87, "source": "script tag"}
+    ],
+    "harborlightlogistics.com": [
+      {"tool": "Salesforce", "category": "CRM", "confidence": 0.97, "source": "dns record"},
+      {"tool": "NetSuite", "category": "ERP", "confidence": 0.85, "source": "job posting"},
+      {"tool": "Snowflake", "category": "Data Warehouse", "confidence": 0.88, "source": "job posting"},
+      {"tool": "Tableau", "category": "BI", "confidence": 0.81, "source": "job posting"},
+      {"tool": "Google Analytics 4", "category": "Web Analytics", "confidence": 0.98, "source": "script tag"},
+      {"tool": "Zendesk", "category": "Support", "confidence": 0.83, "source": "subdomain"}
+    ],
+    "brightseedlabs.com": [
+      {"tool": "HubSpot", "category": "CRM", "confidence": 0.93, "source": "script tag"},
+      {"tool": "Stripe", "category": "Payments", "confidence": 0.89, "source": "script tag"},
+      {"tool": "Mailchimp", "category": "Email Marketing", "confidence": 0.90, "source": "dns record"},
+      {"tool": "Segment", "category": "CDP", "confidence": 0.78, "source": "script tag"},
+      {"tool": "Google Analytics 4", "category": "Web Analytics", "confidence": 0.99, "source": "script tag"}
+    ],
+    "alloyandoak.com": [
+      {"tool": "Shopify", "category": "Ecommerce", "confidence": 0.99, "source": "http header"},
+      {"tool": "Klaviyo", "category": "Email Marketing", "confidence": 0.96, "source": "script tag"},
+      {"tool": "Recharge", "category": "Subscription Billing", "confidence": 0.87, "source": "script tag"},
+      {"tool": "Meta Ads", "category": "Advertising", "confidence": 0.93, "source": "script tag"},
+      {"tool": "Google Ads", "category": "Advertising", "confidence": 0.85, "source": "cookie"},
+      {"tool": "Google Analytics 4", "category": "Web Analytics", "confidence": 0.99, "source": "script tag"},
+      {"tool": "Gorgias", "category": "Support", "confidence": 0.79, "source": "script tag"}
+    ],
+    "tidewatergroup.com": [
+      {"tool": "Salesforce", "category": "CRM", "confidence": 0.96, "source": "dns record"},
+      {"tool": "Pardot", "category": "Email Marketing", "confidence": 0.88, "source": "script tag"},
+      {"tool": "Power BI", "category": "BI", "confidence": 0.82, "source": "job posting"},
+      {"tool": "Google Analytics 4", "category": "Web Analytics", "confidence": 0.98, "source": "script tag"},
+      {"tool": "Zendesk", "category": "Support", "confidence": 0.81, "source": "subdomain"}
+    ],
+    "kestrelsupply.co": [
+      {"tool": "HubSpot", "category": "CRM", "confidence": 0.92, "source": "script tag"},
+      {"tool": "Stripe", "category": "Payments", "confidence": 0.94, "source": "script tag"},
+      {"tool": "Mailchimp", "category": "Email Marketing", "confidence": 0.87, "source": "dns record"},
+      {"tool": "QuickBooks", "category": "Accounting", "confidence": 0.76, "source": "job posting"},
+      {"tool": "Google Analytics 4", "category": "Web Analytics", "confidence": 0.97, "source": "script tag"}
+    ],
+    "lumenpath.eu": [
+      {"tool": "HubSpot", "category": "CRM", "confidence": 0.91, "source": "script tag"},
+      {"tool": "Stripe", "category": "Payments", "confidence": 0.88, "source": "script tag"},
+      {"tool": "Google Analytics 4", "category": "Web Analytics", "confidence": 0.98, "source": "script tag"}
+    ],
+    "marlowanalytics.co.uk": [
+      {"tool": "Salesforce", "category": "CRM", "confidence": 0.93, "source": "dns record"},
+      {"tool": "Mailchimp", "category": "Email Marketing", "confidence": 0.85, "source": "dns record"},
+      {"tool": "Google Analytics 4", "category": "Web Analytics", "confidence": 0.97, "source": "script tag"}
+    ]
+  }
+}

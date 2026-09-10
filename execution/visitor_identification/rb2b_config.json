@@ -1,0 +1,32 @@
+{
+  "_comment": "Config for the visitor identification pipeline. See directives/visitor_identification.md. Flip `mode` to 'live' and set `rb2b_script_id` to cut over to a real RB2B account \u2014 nothing downstream of the webhook receiver changes.",
+  "mode": "mock",
+  "_comment_pixel": "Live-mode pixel. `rb2b_script_id` is the ID from RB2B dashboard > Script Setup. The CDN host and snippet version are RB2B's, verified against their install guide.",
+  "rb2b_script_id": "XXXXXXXXXXX",
+  "rb2b_snippet_version": "1.0.1",
+  "rb2b_cdn": "https://ddwl4m2hdecbv.cloudfront.net/b",
+  "_comment_webhook": "RB2B has no HMAC/signature verification, so their documented auth is a random token in the URL. Rotate this before deploying anywhere public.",
+  "webhook_token": "dev-local-token-change-me",
+  "webhook_url": "http://127.0.0.1:5000/rb2b/webhook",
+  "site_host": "127.0.0.1",
+  "site_port": 5000,
+  "_comment_resolver": "Mock-only. match_rate 1.0 makes every US visitor resolve (demo default). Real RB2B lands nearer 0.3. us_only mirrors RB2B resolving US traffic only. send_repeat_visits mirrors RB2B's opt-in repeat-visitor toggle (default off = initial visit only).",
+  "match_rate": 1.0,
+  "us_only": true,
+  "send_repeat_visits": false,
+  "resolver_delay_seconds": [
+    0.3,
+    1.2
+  ],
+  "enrichment_provider": "mock",
+  "brand_config": "execution/shared/brands/unified_dashboards.json",
+  "_comment_variants": "Which email variants run, in rotation. Defined in execution/visitor_identification/email_variants.json. These six were approved from a variant matrix; peer_frame and proof_point were reviewed and not selected. blind_spot auto-routes to leads that already own a BI tool and ultra_short to companies under 60 staff, regardless of rotation order.",
+  "active_variants": [
+    "stack_math",
+    "monday_scramble",
+    "blind_spot",
+    "new_way",
+    "question_first",
+    "ultra_short"
+  ]
+}
