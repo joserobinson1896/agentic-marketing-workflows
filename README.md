@@ -1,4 +1,4 @@
-# Marketing Automation Workspace
+# Agentic Marketing Workflows
 
 Five marketing pipelines built on a three-layer architecture that separates what to do from
 how it gets done. Ad creative generation, product photo ads, website visitor identification,
